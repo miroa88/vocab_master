@@ -1,0 +1,340 @@
+/* Flashcard Styles - Clean Simple Approach */
+
+.flashcard-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 420px;
+  perspective: 1500px;
+}
+
+.flashcard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.flashcard-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+}
+
+.flashcard-back {
+  background: white;
+  color: #111827;
+  transform: rotateY(180deg);
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Front Content */
+.word-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.word-text {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.part-of-speech-badge {
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tap-hint {
+  position: absolute;
+  bottom: 24px;
+  font-size: 14px;
+  opacity: 0.8;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Back Content */
+.card-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.word-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.word-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #3B82F6;
+  word-break: break-word;
+}
+
+.speak-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: #3B82F6;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.speak-btn:hover {
+  background: #2563EB;
+  transform: scale(1.1);
+}
+
+.speak-btn:active {
+  transform: scale(0.95);
+}
+
+.speak-btn.speaking {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Definition Section */
+.definition-section {
+  margin-bottom: 24px;
+}
+
+.definition-section h4,
+.synonyms-section h4,
+.examples-section h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.definition-text {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #111827;
+}
+
+/* Synonyms Section */
+.synonyms-section {
+  margin-bottom: 24px;
+}
+
+.synonyms-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.synonym-badge {
+  padding: 8px 16px;
+  background: #60A5FA;
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.synonym-badge:hover {
+  background: #3B82F6;
+  transform: translateY(-2px);
+}
+
+/* Examples Section */
+.examples-section {
+  margin-bottom: 16px;
+}
+
+.examples-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.example-card {
+  padding: 16px;
+  background: #F3F4F6;
+  border-left: 4px solid #3B82F6;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.example-card:hover {
+  background: #E5E7EB;
+  transform: translateX(4px);
+}
+
+.example-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #111827;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Learned Indicator */
+.flashcard.learned .flashcard-front::before {
+  content: '✓';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 32px;
+  height: 32px;
+  background: #10B981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Difficulty Indicators */
+.flashcard-front[data-difficulty="basic"]::after {
+  content: '⭐';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+}
+
+.flashcard-front[data-difficulty="intermediate"]::after {
+  content: '⭐⭐';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+}
+
+.flashcard-front[data-difficulty="advanced"]::after {
+  content: '⭐⭐⭐';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+  .flashcard-container {
+    height: 380px;
+  }
+
+  .word-text {
+    font-size: 36px;
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    padding: 20px;
+  }
+
+  .word-title {
+    font-size: 24px;
+  }
+
+  .definition-text {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .flashcard-container {
+    height: 480px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flashcard-container {
+    height: 520px;
+  }
+
+  .flashcard:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .flashcard-back {
+  background: #1F2937;
+  color: #F9FAFB;
+}
+
+[data-theme="dark"] .definition-text {
+  color: #F9FAFB;
+}
+
+[data-theme="dark"] .example-card {
+  background: #374151;
+  color: #F9FAFB;
+}
+
+[data-theme="dark"] .example-card p {
+  color: #F9FAFB;
+}
+
+[data-theme="dark"] .word-header {
+  border-bottom-color: #374151;
+}

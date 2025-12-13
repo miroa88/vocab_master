@@ -1,0 +1,340 @@
+/* Flashcard Styles and 3D Flip Animation */
+
+.flashcard-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  position: relative;
+  height: var(--flashcard-height-mobile);
+  min-height: var(--flashcard-height-mobile);
+}
+
+.flashcard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  overflow: hidden;
+}
+
+/* Front of Card */
+.flashcard-front {
+  background: var(--card-front-gradient);
+  color: var(--text-inverse);
+  text-align: center;
+  position: relative;
+}
+
+.flashcard-front::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.word-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.word-text {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  word-break: break-word;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tap-hint {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* Back of Card */
+.flashcard-back {
+  background-color: var(--card-back-bg);
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  touch-action: pan-y;
+}
+
+.card-content {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.word-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--border);
+}
+
+.word-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary);
+  word-break: break-word;
+  flex: 1;
+}
+
+/* Definition Section */
+.definition-section {
+  margin-bottom: var(--space-xl);
+}
+
+.definition-section h4,
+.synonyms-section h4,
+.examples-section h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-md);
+}
+
+.definition-text {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
+}
+
+/* Synonyms Section */
+.synonyms-section {
+  margin-bottom: var(--space-xl);
+}
+
+.synonyms-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Examples Section */
+.examples-section {
+  margin-bottom: var(--space-md);
+}
+
+.examples-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.example-card {
+  padding: var(--space-md);
+  background-color: var(--border-light);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.example-card:hover {
+  background-color: var(--border);
+  transform: translateX(4px);
+}
+
+.example-card p {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+/* Swipe Indicator */
+.flashcard-container::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: var(--border);
+  border-radius: var(--radius-full);
+}
+
+/* Touch Feedback */
+.flashcard:active .flashcard-inner {
+  transform: scale(0.98);
+}
+
+.flashcard.flipped:active .flashcard-inner {
+  transform: rotateY(180deg) scale(0.98);
+}
+
+/* Loading State */
+.flashcard.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.flashcard.loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+  z-index: 10;
+}
+
+/* Difficulty Indicators */
+.flashcard-front[data-difficulty="basic"]::after {
+  content: '⭐';
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  font-size: var(--font-size-xl);
+}
+
+.flashcard-front[data-difficulty="intermediate"]::after {
+  content: '⭐⭐';
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  font-size: var(--font-size-xl);
+}
+
+.flashcard-front[data-difficulty="advanced"]::after {
+  content: '⭐⭐⭐';
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  font-size: var(--font-size-xl);
+}
+
+/* Learned Indicator */
+.flashcard.learned .flashcard-front::before {
+  content: '✓';
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  width: 32px;
+  height: 32px;
+  background-color: var(--success);
+  color: var(--text-inverse);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  z-index: 2;
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 380px) {
+  .word-text {
+    font-size: var(--font-size-4xl);
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    padding: var(--space-lg);
+  }
+
+  .word-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .definition-text {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 768px) {
+  .flashcard-container {
+    height: var(--flashcard-height-tablet);
+    min-height: var(--flashcard-height-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .flashcard-container {
+    height: var(--flashcard-height-desktop);
+    min-height: var(--flashcard-height-desktop);
+  }
+
+  .flashcard-container:hover .flashcard-inner {
+    box-shadow: var(--shadow-xl);
+  }
+}

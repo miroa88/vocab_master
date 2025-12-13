@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive vocabulary learning app with flashcards, quizzes, and progress tracking">
+    <meta name="theme-color" content="#3B82F6">
+    <title>Vocab Master - Learn English Vocabulary</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/flashcard.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app" class="app-container">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Vocab Master</h1>
+                <div class="progress-indicator">
+                    <span id="progress-text">0/20 learned</span>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-main">
+
+            <!-- Flashcard View -->
+            <div id="flashcard-view" class="view active">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button id="shuffle-btn" class="toolbar-btn" aria-label="Shuffle cards">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+                        </svg>
+                        <span>Shuffle</span>
+                    </button>
+                    <button id="filter-btn" class="toolbar-btn" aria-label="Filter words">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+                        </svg>
+                        <span>Filter</span>
+                    </button>
+                    <div class="search-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search words..." aria-label="Search vocabulary">
+                    </div>
+                </div>
+
+                <!-- Filter Panel (hidden by default) -->
+                <div id="filter-panel" class="filter-panel hidden">
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <div class="filter-options">
+                            <button class="filter-option active" data-filter="all">All</button>
+                            <button class="filter-option" data-filter="unlearned">Unlearned</button>
+                            <button class="filter-option" data-filter="learned">Learned</button>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Difficulty:</label>
+                        <div class="filter-options">
+                            <button class="filter-option active" data-difficulty="all">All</button>
+                            <button class="filter-option" data-difficulty="basic">Basic</button>
+                            <button class="filter-option" data-difficulty="intermediate">Intermediate</button>
+                            <button class="filter-option" data-difficulty="advanced">Advanced</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Counter -->
+                <div class="card-counter">
+                    <span id="card-number">Card 1/20</span>
+                </div>
+
+                <!-- Flashcard -->
+                <div class="flashcard-container">
+                    <div id="flashcard" class="flashcard">
+                        <!-- Front of card -->
+                        <div class="flashcard-front">
+                                <div class="word-container">
+                                    <h2 id="word-front" class="word-text">Loading...</h2>
+                                    <span id="part-of-speech" class="part-of-speech-badge">verb</span>
+                                </div>
+                                <p class="tap-hint">Tap to flip</p>
+                            </div>
+
+                            <!-- Back of card -->
+                            <div class="flashcard-back">
+                                <div class="card-content">
+                                    <div class="word-header">
+                                        <h3 id="word-back" class="word-title">abandon</h3>
+                                        <button id="speak-btn" class="speak-btn" aria-label="Pronounce word">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="definition-section">
+                                        <h4>Definition</h4>
+                                        <p id="definition-text" class="definition-text">To give up completely; to desert or leave behind</p>
+                                    </div>
+
+                                    <div class="synonyms-section">
+                                        <h4>Synonyms</h4>
+                                        <div id="synonyms-container" class="synonyms-container">
+                                            <span class="synonym-badge">desert</span>
+                                            <span class="synonym-badge">forsake</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="examples-section">
+                                        <h4>Examples</h4>
+                                        <div id="examples-container" class="examples-container">
+                                            <div class="example-card">
+                                                <p>Example sentence 1...</p>
+                                            </div>
+                                            <div class="example-card">
+                                                <p>Example sentence 2...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+                <!-- Card Controls -->
+                <div class="card-controls">
+                    <div class="navigation-buttons">
+                        <button id="prev-btn" class="control-btn" aria-label="Previous card">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 18l-6-6 6-6"/>
+                            </svg>
+                            <span>Previous</span>
+                        </button>
+
+                        <button id="next-btn" class="control-btn" aria-label="Next card">
+                            <span>Next</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button id="mark-learned-btn" class="mark-learned-btn" aria-label="Mark as learned">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <span id="learned-text">Mark as Learned</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz View -->
+            <div id="quiz-view" class="view">
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <h2 id="quiz-title">Choose Quiz Mode</h2>
+                        <div id="quiz-progress" class="quiz-progress hidden">
+                            <span id="quiz-counter">Question 1/10</span>
+                            <div class="progress-bar">
+                                <div id="quiz-progress-fill" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Mode Selection -->
+                    <div id="quiz-mode-selection" class="quiz-mode-selection">
+                        <div class="mode-card" id="multiple-choice-mode">
+                            <div class="mode-icon">📝</div>
+                            <h3>Multiple Choice</h3>
+                            <p>Test your knowledge by selecting the correct word from 4 options</p>
+                            <button class="btn-primary">Start Quiz</button>
+                        </div>
+                        <div class="mode-card" id="self-assessment-mode">
+                            <div class="mode-icon">🧠</div>
+                            <h3>Self Assessment</h3>
+                            <p>Recall the definition and rate your confidence level</p>
+                            <button class="btn-primary">Start Quiz</button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Content (hidden initially) -->
+                    <div id="quiz-content" class="quiz-content hidden">
+                        <!-- Multiple Choice Quiz -->
+                        <div id="multiple-choice-quiz" class="quiz-type hidden">
+                            <div class="question-card">
+                                <p id="mc-definition" class="quiz-question">Loading...</p>
+                                <div id="mc-options" class="quiz-options">
+                                    <!-- Options will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Self Assessment Quiz -->
+                        <div id="self-assessment-quiz" class="quiz-type hidden">
+                            <div class="question-card">
+                                <h3 id="sa-word" class="sa-word">Loading...</h3>
+                                <button id="show-answer-btn" class="btn-secondary">Show Answer</button>
+                                <div id="sa-answer" class="sa-answer hidden">
+                                    <p id="sa-definition"></p>
+                                    <div class="confidence-rating">
+                                        <p>How well did you know this word?</p>
+                                        <div class="rating-buttons">
+                                            <button class="rating-btn" data-rating="1">Don't Know</button>
+                                            <button class="rating-btn" data-rating="2">Hard</button>
+                                            <button class="rating-btn" data-rating="3">Medium</button>
+                                            <button class="rating-btn" data-rating="4">Easy</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="quiz-next-btn" class="btn-primary hidden">Next Question</button>
+                    </div>
+
+                    <!-- Quiz Results -->
+                    <div id="quiz-results" class="quiz-results hidden">
+                        <div class="results-card">
+                            <h2>Quiz Complete!</h2>
+                            <div class="score-display">
+                                <div class="score-circle">
+                                    <span id="score-percentage">0%</span>
+                                </div>
+                                <p id="score-text">You got 0 out of 10 correct</p>
+                            </div>
+                            <div class="results-actions">
+                                <button id="review-mistakes-btn" class="btn-secondary">Review Mistakes</button>
+                                <button id="restart-quiz-btn" class="btn-primary">Take Another Quiz</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics View -->
+            <div id="stats-view" class="view">
+                <div class="stats-container">
+                    <h2>Your Progress</h2>
+
+                    <div class="stats-grid">
+                        <!-- Overall Progress -->
+                        <div class="stat-card large">
+                            <h3>Overall Progress</h3>
+                            <div class="progress-circle">
+                                <svg viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+                                    <circle id="progress-circle" cx="60" cy="60" r="54" fill="none" stroke="#10B981"
+                                            stroke-width="8" stroke-dasharray="339.292" stroke-dashoffset="339.292"
+                                            transform="rotate(-90 60 60)"/>
+                                </svg>
+                                <div class="progress-percentage">
+                                    <span id="overall-percentage">0%</span>
+                                    <small id="words-learned-count">0/20 words</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Study Streak -->
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <h3>Study Streak</h3>
+                            <p class="stat-value" id="streak-count">0 days</p>
+                            <small class="stat-label">Keep it up!</small>
+                        </div>
+
+                        <!-- Words This Week -->
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <h3>This Week</h3>
+                            <p class="stat-value" id="week-words">0 words</p>
+                            <small class="stat-label">Words learned</small>
+                        </div>
+
+                        <!-- Study Time -->
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <h3>Study Time</h3>
+                            <p class="stat-value" id="total-time">0 min</p>
+                            <small class="stat-label">Total time</small>
+                        </div>
+
+                        <!-- Quiz Performance -->
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <h3>Quiz Score</h3>
+                            <p class="stat-value" id="quiz-average">0%</p>
+                            <small class="stat-label">Average score</small>
+                        </div>
+                    </div>
+
+                    <!-- Recent Sessions -->
+                    <div class="sessions-section">
+                        <h3>Recent Sessions</h3>
+                        <div id="sessions-list" class="sessions-list">
+                            <p class="empty-state">No study sessions yet. Start learning to see your history!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view">
+                <div class="settings-container">
+                    <h2>Settings</h2>
+
+                    <div class="settings-section">
+                        <h3>Appearance</h3>
+                        <div class="setting-item">
+                            <label for="theme-toggle">
+                                <span>Dark Mode</span>
+                                <p class="setting-description">Switch between light and dark theme</p>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Speech</h3>
+                        <div class="setting-item">
+                            <label for="speech-rate">
+                                <span>Speech Rate</span>
+                                <p class="setting-description">Adjust pronunciation speed</p>
+                            </label>
+                            <input type="range" id="speech-rate" min="0.5" max="1.5" step="0.1" value="0.9">
+                            <span id="speech-rate-value">0.9x</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="auto-play">
+                                <span>Auto-play Pronunciation</span>
+                                <p class="setting-description">Automatically pronounce words when flipping cards</p>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="auto-play">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Data</h3>
+                        <div class="setting-item">
+                            <button id="export-btn" class="btn-secondary full-width">Export Progress</button>
+                        </div>
+                        <div class="setting-item">
+                            <button id="reset-btn" class="btn-danger full-width">Reset All Progress</button>
+                        </div>
+                    </div>
+
+                    <div class="app-info">
+                        <p>Vocab Master v1.0</p>
+                        <p>572 Academic Word List vocabulary</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="flashcard-view" aria-label="Flashcards">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                <span>Flashcards</span>
+            </button>
+            <button class="nav-btn" data-view="quiz-view" aria-label="Quiz">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>Quiz</span>
+            </button>
+            <button class="nav-btn" data-view="stats-view" aria-label="Statistics">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Statistics</span>
+            </button>
+            <button class="nav-btn" data-view="settings-view" aria-label="Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6m0-6h6M12 7H6m6 6H6"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/flashcard.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
