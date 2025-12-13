@@ -482,11 +482,57 @@
 .setting-description {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.setting-description a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+}
+
+.setting-description a:hover {
+  text-decoration: underline;
 }
 
 .setting-item input[type="range"] {
   flex: 1;
   max-width: 200px;
+}
+
+/* API Key Setting */
+.api-key-setting {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.api-key-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.api-key-input {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-family: monospace;
+  color: var(--text-primary);
+  background-color: var(--background);
+  transition: all var(--transition-fast);
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.api-key-input::placeholder {
+  color: var(--text-tertiary);
+  font-family: sans-serif;
 }
 
 /* Progress Circle (for stats) */

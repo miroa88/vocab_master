@@ -54,8 +54,11 @@ const QuizMode = {
     this.answers = [];
     this.sessionStartTime = Date.now();
 
-    // Get quiz words (10 random words)
-    this.quizWords = DataService.getQuizWords(10);
+    // Prefer all learned words for a comprehensive review; fall back to random pool
+    const learnedWords = DataService.getLearnedWords();
+    this.quizWords = learnedWords.length > 0
+      ? Utils.shuffle(learnedWords)
+      : DataService.getQuizWords(10);
 
     if (this.quizWords.length === 0) {
       Utils.showToast('No words available for quiz', 'error');
@@ -98,14 +101,15 @@ const QuizMode = {
     const mcDefinition = document.getElementById('mc-definition');
     const mcOptions = document.getElementById('mc-options');
 
-    // Set question
-    mcDefinition.textContent = word.definition;
+    // Academic-styled prompt with context
+    const example = Array.isArray(word.examples) && word.examples.length > 0 ? word.examples[0] : '';
+    mcDefinition.innerHTML = `
+      <div><strong>Definition:</strong> ${word.definition}</div>
+      ${example ? `<div class="quiz-context">Context: ${example}</div>` : ''}
+    `;
 
-    // Generate options (correct word + 3 random wrong words)
-    const wrongWords = DataService.getAll()
-      .filter(w => w.id !== word.id)
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
+    // Generate options (correct word + 3 targeted distractors)
+    const wrongWords = DataService.getSimilarDistractors(word, 3);
 
     const options = Utils.shuffle([word, ...wrongWords]);
 
@@ -169,7 +173,12 @@ const QuizMode = {
     const showAnswerBtn = document.getElementById('show-answer-btn');
 
     saWord.textContent = word.word;
-    saDefinition.textContent = word.definition;
+    const example = Array.isArray(word.examples) && word.examples.length > 0 ? word.examples[0] : '';
+    saDefinition.innerHTML = `
+      <div><strong>Definition:</strong> ${word.definition}</div>
+      ${example ? `<div class="quiz-context">Context: ${example}</div>` : ''}
+      <div class="quiz-context subtle">Academic prompt: restate in your own words and give a professional use case.</div>
+    `;
 
     // Reset answer section
     saAnswer.classList.add('hidden');

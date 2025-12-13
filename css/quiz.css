@@ -101,6 +101,18 @@
   font-weight: var(--font-weight-medium);
 }
 
+.quiz-context {
+  display: block;
+  margin-top: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.quiz-context.subtle {
+  color: var(--text-tertiary);
+}
+
 .quiz-options {
   display: grid;
   grid-template-columns: 1fr;

@@ -428,13 +428,15 @@
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
-                        <div class="setting-item">
+                        <div class="setting-item api-key-setting">
                             <label for="gemini-api-key">
-                                <span>Gemini API Key</span>
-                                <p class="setting-description">Enter your Gemini API Key for high-quality text-to-speech. This is an optional feature.</p>
+                                <span>Gemini TTS API Key (Optional)</span>
+                                <p class="setting-description">Enable high-quality neural text-to-speech with Gemini. Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a>.</p>
                             </label>
-                            <input type="text" id="gemini-api-key" placeholder="Enter your API key">
-                            <button id="save-api-key" class="btn-primary">Save Key</button>
+                            <div class="api-key-input-group">
+                                <input type="password" id="gemini-api-key" placeholder="Enter your Gemini TTS API key" class="api-key-input">
+                                <button id="save-api-key" class="btn-secondary">Save</button>
+                            </div>
                         </div>
                     </div>
 

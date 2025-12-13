@@ -122,6 +122,42 @@ const DataService = {
     return quizWords;
   },
 
+  // Get all learned words for the current user
+  getLearnedWords() {
+    const learnedIds = StorageService.getLearnedIds();
+    if (!learnedIds || learnedIds.length === 0) return [];
+    return this.vocabulary.filter(word => learnedIds.includes(word.id));
+  },
+
+  // Get academically relevant distractors for a multiple-choice question
+  getSimilarDistractors(word, count = 3) {
+    const samePos = this.vocabulary.filter(
+      w => w.id !== word.id && w.partOfSpeech === word.partOfSpeech
+    );
+
+    const sameDifficulty = this.vocabulary.filter(
+      w => w.id !== word.id && w.difficulty === word.difficulty
+    );
+
+    const pool = Utils.shuffle([
+      ...samePos,
+      ...sameDifficulty
+    ].filter((value, index, self) => self.indexOf(value) === index));
+
+    const needed = Math.min(count, pool.length);
+    const picked = pool.slice(0, needed);
+
+    if (picked.length < count) {
+      const extras = this.vocabulary
+        .filter(w => w.id !== word.id && !picked.includes(w))
+        .sort(() => 0.5 - Math.random())
+        .slice(0, count - picked.length);
+      return [...picked, ...extras];
+    }
+
+    return picked;
+  },
+
   // Get words that need review (based on quiz performance)
   getWordsNeedingReview(count = 10) {
     const wordsWithScores = this.vocabulary.map(word => {

@@ -21,9 +21,14 @@ const SpeechService = {
       }
     }
 
-    const savedRate = StorageService.getPreference('speechRate');
-    if (savedRate) {
-      this.settings.rate = savedRate;
+    try {
+      const savedRate = StorageService.getPreference('speechRate');
+      if (savedRate) {
+        this.settings.rate = savedRate;
+      }
+    } catch (error) {
+      // User not selected yet, use default rate
+      console.log('Using default speech rate');
     }
 
     return true;
@@ -64,7 +69,7 @@ const SpeechService = {
 
   // Speak with Gemini API
   async speakWithGemini(text, apiKey, options) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/text:synthesizeSpeech?key=${apiKey}`;
+    const url = `https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -72,26 +77,40 @@ const SpeechService = {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        text: text,
-        voice: {
-          languageCode: 'en-US',
-          name: 'en-US-News-M'
-        },
-        audioConfig: {
-          audioEncoding: 'MP3',
-          speakingRate: this.settings.rate,
-          pitch: this.settings.pitch
+        contents: [{
+          role: "user",
+          parts: [{
+            text: text
+          }]
+        }],
+        generationConfig: {
+          response_modalities: ["AUDIO"],
+          speech_config: {
+            voice_config: {
+              prebuilt_voice_config: {
+                voice_name: "Puck"
+              }
+            }
+          }
         }
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini API request failed with status ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Gemini TTS API request failed: ${errorData.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
-    const audioContent = data.audioContent;
 
+    // Extract audio content from response
+    const audioContent = data.candidates?.[0]?.content?.parts?.[0]?.inline_data?.data;
+
+    if (!audioContent) {
+      throw new Error('No audio content in response');
+    }
+
+    // Decode base64 audio and play it
     const audioBuffer = await this.audioContext.decodeAudioData(this.base64ToArrayBuffer(audioContent));
 
     const source = this.audioContext.createBufferSource();
