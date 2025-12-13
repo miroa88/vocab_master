@@ -99,8 +99,8 @@
   --z-tooltip: 600;
 
   /* Layout */
-  --header-height: 80px;
-  --bottom-nav-height: 72px;
+  --header-height: 60px;
+  --bottom-nav-height: 60px;
   --max-content-width: 900px;
 
   /* Flashcard Specific */

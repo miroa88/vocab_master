@@ -10,6 +10,20 @@ const App = {
     this.showLoading();
 
     try {
+      // Initialize user system
+      this.setupUserManagement();
+
+      // Check if user is selected
+      const currentUserId = StorageService.initUserSystem();
+      if (!currentUserId) {
+        this.hideLoading();
+        this.showUserModal();
+        return;
+      }
+
+      // Update user display
+      this.updateUserDisplay();
+
       // Load vocabulary data
       const loaded = await DataService.load();
 
@@ -39,7 +53,8 @@ const App = {
 
       this.hideLoading();
 
-      Utils.showToast('Welcome to Vocab Master!', 'success');
+      const user = StorageService.getCurrentUser();
+      Utils.showToast(`Welcome back, ${user.name}!`, 'success');
 
     } catch (error) {
       console.error('Error initializing app:', error);
@@ -218,6 +233,152 @@ const App = {
     }
 
     this.updateSession();
+  },
+
+  // Setup user management
+  setupUserManagement() {
+    const userSwitcher = document.getElementById('user-switcher');
+    const addUserBtn = document.getElementById('add-user-btn');
+    const newUserInput = document.getElementById('new-user-name');
+
+    // User switcher button
+    userSwitcher.addEventListener('click', () => {
+      this.showUserModal();
+    });
+
+    // Add user button
+    addUserBtn.addEventListener('click', () => {
+      this.createNewUser();
+    });
+
+    // Enter key to create user
+    newUserInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.createNewUser();
+      }
+    });
+  },
+
+  // Show user modal
+  showUserModal() {
+    const modal = document.getElementById('user-modal');
+    const userList = document.getElementById('user-list');
+
+    // Get all users
+    const users = StorageService.getAllUsers();
+    const currentUserId = StorageService.currentUserId;
+
+    // Clear and populate user list
+    userList.innerHTML = '';
+
+    if (users.length === 0) {
+      userList.innerHTML = '<p class="empty-state">No users yet. Create one below!</p>';
+    } else {
+      users.forEach(user => {
+        // Get user stats
+        const oldUserId = StorageService.currentUserId;
+        StorageService.currentUserId = user.id;
+        const learnedCount = StorageService.getLearnedCount();
+        StorageService.currentUserId = oldUserId;
+
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item' + (user.id === currentUserId ? ' active' : '');
+        userItem.innerHTML = `
+          <div class="user-info">
+            <div class="user-name">${this.escapeHtml(user.name)}</div>
+            <div class="user-stats">${learnedCount} words learned</div>
+          </div>
+          <button class="user-delete" data-user-id="${user.id}" title="Delete user">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
+          </button>
+        `;
+
+        // Select user
+        userItem.addEventListener('click', (e) => {
+          if (!e.target.closest('.user-delete')) {
+            this.selectUser(user.id);
+          }
+        });
+
+        // Delete user
+        const deleteBtn = userItem.querySelector('.user-delete');
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteUser(user.id);
+        });
+
+        userList.appendChild(userItem);
+      });
+    }
+
+    modal.classList.add('show');
+  },
+
+  // Hide user modal
+  hideUserModal() {
+    const modal = document.getElementById('user-modal');
+    modal.classList.remove('show');
+  },
+
+  // Create new user
+  createNewUser() {
+    const input = document.getElementById('new-user-name');
+    const name = input.value.trim();
+
+    if (!name) {
+      Utils.showToast('Please enter a name', 'error');
+      return;
+    }
+
+    const userId = StorageService.addUser(name);
+    this.selectUser(userId);
+    input.value = '';
+  },
+
+  // Select user
+  selectUser(userId) {
+    StorageService.setCurrentUser(userId);
+    this.hideUserModal();
+
+    // Reload the app with new user
+    window.location.reload();
+  },
+
+  // Delete user
+  deleteUser(userId) {
+    const users = StorageService.getAllUsers();
+    const user = users.find(u => u.id === userId);
+
+    if (!user) return;
+
+    if (confirm(`Are you sure you want to delete ${user.name}'s profile? This cannot be undone.`)) {
+      StorageService.deleteUser(userId);
+
+      // If we deleted the current user, show modal to select another
+      if (StorageService.currentUserId === null) {
+        this.showUserModal();
+      } else {
+        // Just refresh the modal
+        this.showUserModal();
+      }
+    }
+  },
+
+  // Update user display
+  updateUserDisplay() {
+    const user = StorageService.getCurrentUser();
+    if (user) {
+      document.getElementById('current-user-name').textContent = user.name;
+    }
+  },
+
+  // Escape HTML to prevent XSS
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 };
 

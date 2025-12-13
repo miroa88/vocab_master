@@ -1,7 +1,83 @@
 // LocalStorage Wrapper for Progress Tracking
 
 const StorageService = {
-  STORAGE_KEY: 'vocabProgress',
+  STORAGE_KEY_PREFIX: 'vocabProgress_',
+  USERS_KEY: 'vocabUsers',
+  CURRENT_USER_KEY: 'vocabCurrentUser',
+  currentUserId: null,
+
+  // Initialize user system
+  initUserSystem() {
+    const currentUser = localStorage.getItem(this.CURRENT_USER_KEY);
+    if (currentUser) {
+      this.currentUserId = currentUser;
+    }
+    return this.currentUserId;
+  },
+
+  // Get all users
+  getAllUsers() {
+    try {
+      const usersData = localStorage.getItem(this.USERS_KEY);
+      if (!usersData) {
+        return [];
+      }
+      return JSON.parse(usersData);
+    } catch (error) {
+      console.error('Error reading users:', error);
+      return [];
+    }
+  },
+
+  // Add new user
+  addUser(userName) {
+    const users = this.getAllUsers();
+    const userId = 'user_' + Date.now();
+    users.push({
+      id: userId,
+      name: userName,
+      createdAt: new Date().toISOString()
+    });
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+    return userId;
+  },
+
+  // Set current user
+  setCurrentUser(userId) {
+    this.currentUserId = userId;
+    localStorage.setItem(this.CURRENT_USER_KEY, userId);
+  },
+
+  // Get current user
+  getCurrentUser() {
+    const users = this.getAllUsers();
+    return users.find(u => u.id === this.currentUserId);
+  },
+
+  // Delete user
+  deleteUser(userId) {
+    // Remove user from users list
+    const users = this.getAllUsers();
+    const filteredUsers = users.filter(u => u.id !== userId);
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(filteredUsers));
+
+    // Remove user's data
+    localStorage.removeItem(this.STORAGE_KEY_PREFIX + userId);
+
+    // If deleting current user, clear current user
+    if (this.currentUserId === userId) {
+      this.currentUserId = null;
+      localStorage.removeItem(this.CURRENT_USER_KEY);
+    }
+  },
+
+  // Get storage key for current user
+  getUserStorageKey() {
+    if (!this.currentUserId) {
+      throw new Error('No user selected');
+    }
+    return this.STORAGE_KEY_PREFIX + this.currentUserId;
+  },
 
   // Get default structure
   getDefault() {
@@ -30,7 +106,7 @@ const StorageService = {
   // Get all data
   get() {
     try {
-      const data = localStorage.getItem(this.STORAGE_KEY);
+      const data = localStorage.getItem(this.getUserStorageKey());
       if (!data) {
         return this.getDefault();
       }
@@ -46,7 +122,7 @@ const StorageService = {
   // Save all data
   save(data) {
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(this.getUserStorageKey(), JSON.stringify(data));
       return true;
     } catch (error) {
       console.error('Error saving storage:', error);
