@@ -119,6 +119,8 @@ const App = {
     const reverseModeToggle = document.getElementById('reverse-mode');
     const exportBtn = document.getElementById('export-btn');
     const resetBtn = document.getElementById('reset-btn');
+    const geminiApiKeyInput = document.getElementById('gemini-api-key');
+    const saveApiKeyBtn = document.getElementById('save-api-key');
 
     // Language checkboxes
     const langHy = document.getElementById('lang-hy');
@@ -188,6 +190,18 @@ const App = {
     // Load saved auto-play preference
     const savedAutoPlay = StorageService.getPreference('autoPlay');
     autoPlayToggle.checked = savedAutoPlay;
+
+    // Gemini API Key
+    const savedApiKey = StorageService.getPreference('geminiApiKey');
+    if (savedApiKey) {
+      geminiApiKeyInput.value = savedApiKey;
+    }
+
+    saveApiKeyBtn.addEventListener('click', () => {
+      const apiKey = geminiApiKeyInput.value.trim();
+      StorageService.updatePreference('geminiApiKey', apiKey);
+      Utils.showToast('API Key saved!', 'success');
+    });
 
     // Export button
     exportBtn.addEventListener('click', () => {

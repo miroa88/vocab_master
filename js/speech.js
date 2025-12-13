@@ -1,7 +1,8 @@
-// Text-to-Speech Service using Web Speech API
+// Text-to-Speech Service using Web Speech API and Gemini API
 
 const SpeechService = {
   synth: window.speechSynthesis,
+  audioContext: new (window.AudioContext || window.webkitAudioContext)(),
   voices: [],
   currentUtterance: null,
   settings: {
@@ -13,22 +14,13 @@ const SpeechService = {
 
   // Initialize speech service
   init() {
-    if (!this.isSupported()) {
-      console.warn('Speech synthesis not supported in this browser');
-      return false;
+    if (this.isSupported()) {
+      this.loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => this.loadVoices();
+      }
     }
 
-    // Load voices
-    this.loadVoices();
-
-    // Chrome loads voices asynchronously
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = () => {
-        this.loadVoices();
-      };
-    }
-
-    // Load saved settings
     const savedRate = StorageService.getPreference('speechRate');
     if (savedRate) {
       this.settings.rate = savedRate;
@@ -45,39 +37,96 @@ const SpeechService = {
   // Load available voices
   loadVoices() {
     this.voices = this.synth.getVoices();
-
-    // Filter for English voices
-    const englishVoices = this.voices.filter(voice =>
-      voice.lang.startsWith('en')
-    );
-
-    // Prefer US English voice
-    const usVoice = englishVoices.find(voice =>
-      voice.lang === 'en-US' && voice.name.includes('Google')
-    ) || englishVoices.find(voice =>
-      voice.lang === 'en-US'
-    ) || englishVoices[0];
-
+    const englishVoices = this.voices.filter(voice => voice.lang.startsWith('en'));
+    const usVoice = englishVoices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')) || englishVoices.find(voice => voice.lang === 'en-US') || englishVoices[0];
     if (usVoice) {
       this.settings.voice = usVoice;
     }
   },
 
   // Speak text
-  speak(text, options = {}) {
+  async speak(text, options = {}) {
+    const geminiApiKey = StorageService.getPreference('geminiApiKey');
+
+    if (geminiApiKey) {
+      try {
+        await this.speakWithGemini(text, geminiApiKey, options);
+        return true;
+      } catch (error) {
+        console.error('Gemini TTS failed, falling back to browser speech', error);
+        Utils.showToast('Gemini TTS failed, using browser voice', 'error');
+        return this.speakWithBrowser(text, options);
+      }
+    } else {
+      return this.speakWithBrowser(text, options);
+    }
+  },
+
+  // Speak with Gemini API
+  async speakWithGemini(text, apiKey, options) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/text:synthesizeSpeech?key=${apiKey}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: text,
+        voice: {
+          languageCode: 'en-US',
+          name: 'en-US-News-M'
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: this.settings.rate,
+          pitch: this.settings.pitch
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const audioContent = data.audioContent;
+
+    const audioBuffer = await this.audioContext.decodeAudioData(this.base64ToArrayBuffer(audioContent));
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(this.audioContext.destination);
+
+    if (options.onStart) options.onStart();
+    source.onended = () => {
+      if (options.onEnd) options.onEnd();
+    };
+    source.start(0);
+  },
+
+  base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+  },
+
+  // Speak with browser's Web Speech API
+  speakWithBrowser(text, options = {}) {
     if (!this.isSupported()) {
       console.warn('Speech synthesis not available');
       return false;
     }
 
-    // Cancel any ongoing speech
     this.cancel();
 
-    // Create utterance
     const utterance = new SpeechSynthesisUtterance(text);
     this.currentUtterance = utterance;
 
-    // Apply settings
     utterance.rate = options.rate || this.settings.rate;
     utterance.pitch = options.pitch || this.settings.pitch;
     utterance.volume = options.volume || this.settings.volume;
@@ -86,7 +135,6 @@ const SpeechService = {
       utterance.voice = this.settings.voice;
     }
 
-    // Event handlers
     utterance.onstart = () => {
       if (options.onStart) options.onStart();
     };
@@ -102,7 +150,6 @@ const SpeechService = {
       if (options.onError) options.onError(event);
     };
 
-    // Speak
     try {
       this.synth.speak(utterance);
       return true;
@@ -112,26 +159,22 @@ const SpeechService = {
     }
   },
 
-  // Speak word with definition
   speakWord(word) {
     return this.speak(word);
   },
 
-  // Pause speech
   pause() {
     if (this.synth.speaking && !this.synth.paused) {
       this.synth.pause();
     }
   },
 
-  // Resume speech
   resume() {
     if (this.synth.paused) {
       this.synth.resume();
     }
   },
 
-  // Cancel speech
   cancel() {
     if (this.synth.speaking || this.synth.pending) {
       this.synth.cancel();
@@ -139,38 +182,31 @@ const SpeechService = {
     }
   },
 
-  // Check if currently speaking
   isSpeaking() {
     return this.synth.speaking;
   },
 
-  // Update speech rate
   setRate(rate) {
     this.settings.rate = Math.max(0.5, Math.min(1.5, rate));
     StorageService.updatePreference('speechRate', this.settings.rate);
   },
 
-  // Get current rate
   getRate() {
     return this.settings.rate;
   },
 
-  // Update pitch
   setPitch(pitch) {
     this.settings.pitch = Math.max(0.5, Math.min(2, pitch));
   },
 
-  // Update volume
   setVolume(volume) {
     this.settings.volume = Math.max(0, Math.min(1, volume));
   },
 
-  // Get available voices
   getVoices() {
     return this.voices.filter(voice => voice.lang.startsWith('en'));
   },
 
-  // Set voice by name
   setVoice(voiceName) {
     const voice = this.voices.find(v => v.name === voiceName);
     if (voice) {
@@ -180,7 +216,6 @@ const SpeechService = {
     return false;
   },
 
-  // Get current voice
   getCurrentVoice() {
     return this.settings.voice;
   }

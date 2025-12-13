@@ -92,7 +92,8 @@ const StorageService = {
         autoPlay: false,
         showProgress: true,
         translationLanguages: ['Hy'], // Default: Armenian only
-        reverseMode: false // Default: show word first
+        reverseMode: false, // Default: show word first
+        geminiApiKey: null
       },
       stats: {
         totalTimeSpent: 0,
