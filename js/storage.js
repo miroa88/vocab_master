@@ -90,7 +90,9 @@ const StorageService = {
         speechRate: 0.9,
         theme: 'light',
         autoPlay: false,
-        showProgress: true
+        showProgress: true,
+        translationLanguages: ['Hy'], // Default: Armenian only
+        reverseMode: false // Default: show word first
       },
       stats: {
         totalTimeSpent: 0,

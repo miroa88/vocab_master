@@ -56,7 +56,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .app-title {
@@ -64,6 +64,7 @@ body {
   font-weight: var(--font-weight-bold);
   color: var(--primary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Progress Indicator in Header */
@@ -71,9 +72,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 120px;
-  flex: 1;
-  max-width: 250px;
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 #progress-text {

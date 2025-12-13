@@ -116,8 +116,51 @@ const App = {
     const speechRateSlider = document.getElementById('speech-rate');
     const speechRateValue = document.getElementById('speech-rate-value');
     const autoPlayToggle = document.getElementById('auto-play');
+    const reverseModeToggle = document.getElementById('reverse-mode');
     const exportBtn = document.getElementById('export-btn');
     const resetBtn = document.getElementById('reset-btn');
+
+    // Language checkboxes
+    const langHy = document.getElementById('lang-hy');
+    const langFa = document.getElementById('lang-fa');
+    const langEn = document.getElementById('lang-en');
+
+    // Load saved language preferences
+    const savedLanguages = StorageService.getPreference('translationLanguages') || ['Hy'];
+    langHy.checked = savedLanguages.includes('Hy');
+    langFa.checked = savedLanguages.includes('Fa');
+    langEn.checked = savedLanguages.includes('En');
+
+    // Language preference change handlers
+    const updateLanguagePreferences = () => {
+      const enabledLanguages = [];
+      if (langHy.checked) enabledLanguages.push('Hy');
+      if (langFa.checked) enabledLanguages.push('Fa');
+      if (langEn.checked) enabledLanguages.push('En');
+
+      StorageService.updatePreference('translationLanguages', enabledLanguages);
+
+      // Refresh flashcard display
+      if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
+        FlashcardMode.renderCard();
+      }
+    };
+
+    langFa.addEventListener('change', updateLanguagePreferences);
+    langEn.addEventListener('change', updateLanguagePreferences);
+
+    // Reverse mode toggle
+    reverseModeToggle.addEventListener('change', (e) => {
+      StorageService.updatePreference('reverseMode', e.target.checked);
+      // Refresh flashcard display
+      if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
+        FlashcardMode.renderCard();
+      }
+    });
+
+    // Load saved reverse mode preference
+    const savedReverseMode = StorageService.getPreference('reverseMode');
+    reverseModeToggle.checked = savedReverseMode;
 
     // Theme toggle
     themeToggle.addEventListener('change', (e) => {

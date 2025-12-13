@@ -67,8 +67,8 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
   flex-wrap: wrap;
 }
 
@@ -76,16 +76,16 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-sm);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .toolbar-btn:hover {
@@ -102,13 +102,13 @@
 .search-box {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   flex: 1;
-  min-width: 200px;
+  min-width: 150px;
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
   transition: all var(--transition-fast);
 }
 
@@ -140,9 +140,9 @@
 .filter-panel {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  margin-bottom: var(--space-sm);
   animation: slideDown var(--transition-base);
 }
 
@@ -158,7 +158,7 @@
 }
 
 .filter-group {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .filter-group:last-child {
@@ -167,16 +167,16 @@
 
 .filter-group label {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--text-secondary);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-xs);
 }
 
 .filter-options {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .filter-option {
@@ -232,67 +232,82 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Toggle Switch */
+/* Toggle Switch - Simplified */
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 52px;
-  height: 28px;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
   opacity: 0;
   width: 0;
   height: 0;
+  position: absolute;
 }
 
 .toggle-slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: var(--transition-base);
-  border-radius: var(--radius-full);
+  inset: 0;
+  background-color: #d1d5db;
+  border-radius: 22px;
+  transition: background-color 0.2s ease;
 }
 
-.toggle-slider:before {
-  position: absolute;
+.toggle-slider::before {
   content: "";
-  height: 20px;
-  width: 20px;
-  left: 4px;
-  bottom: 4px;
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  top: 3px;
   background-color: white;
-  transition: var(--transition-base);
-  border-radius: var(--radius-full);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-input:checked + .toggle-slider {
-  background-color: var(--success);
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #10b981;
 }
 
-input:checked + .toggle-slider:before {
-  transform: translateX(24px);
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
 }
 
-/* Card Counter */
+/* Card Counter - Header Integration */
 .card-counter {
-  text-align: center;
-  margin-bottom: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 80px;
+  flex: 1;
+  max-width: 120px;
 }
 
 .card-counter span {
   display: inline-block;
-  padding: var(--space-xs) var(--space-lg);
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
+}
+
+.card-progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
 }
 
 /* Empty State */
@@ -306,19 +321,22 @@ input:checked + .toggle-slider:before {
 /* Control Buttons */
 .card-controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: var(--space-md);
-  margin-top: var(--space-xl);
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .navigation-buttons {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  width: 100%;
-  max-width: 400px;
+  gap: var(--space-sm);
+  flex: 1;
 }
 
 .control-btn {
@@ -326,16 +344,16 @@ input:checked + .toggle-slider:before {
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
   background-color: var(--surface);
   border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-base);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: 44px;
+  min-height: 40px;
   flex: 1;
 }
 
@@ -360,19 +378,18 @@ input:checked + .toggle-slider:before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-xl);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
   background-color: var(--surface);
   border: 2px solid var(--success);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-base);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--success);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: 44px;
-  width: 100%;
-  max-width: 400px;
+  max-height: 40px;
+  flex: 1;
 }
 
 .mark-learned-btn:hover {
@@ -632,31 +649,26 @@ input:checked + .toggle-slider:before {
 
 /* User Switcher */
 .user-switcher {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--text-inverse);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
-  margin-left: var(--space-md);
+  flex-shrink: 0;
 }
 
 .user-switcher:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--border-light);
   transform: translateY(-1px);
 }
 
 .user-switcher svg {
   flex-shrink: 0;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
 }

@@ -36,22 +36,30 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-content">
-                <div class="header-left">
-                    <h1 class="app-title">Vocab Master</h1>
-                    <button id="user-switcher" class="user-switcher" title="Switch user">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        <span id="current-user-name">User</span>
-                    </button>
+                <h1 class="app-title">Vocab Master</h1>
+
+                <!-- Card Counter -->
+                <div class="card-counter">
+                    <span id="card-number">Card 1/20</span>
+                    <div class="card-progress-bar">
+                        <div id="card-progress-fill" class="card-progress-fill" style="width: 5%"></div>
+                    </div>
                 </div>
+
                 <div class="progress-indicator">
                     <span id="progress-text">0/20 learned</span>
                     <div class="progress-bar">
                         <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
                     </div>
                 </div>
+
+                <button id="user-switcher" class="user-switcher" title="Switch user">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span id="current-user-name">User</span>
+                </button>
             </div>
         </header>
 
@@ -75,7 +83,7 @@
                         <span>Filter</span>
                     </button>
                     <div class="search-box">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"/>
                             <path d="m21 21-4.35-4.35"/>
                         </svg>
@@ -104,10 +112,7 @@
                     </div>
                 </div>
 
-                <!-- Card Counter -->
-                <div class="card-counter">
-                    <span id="card-number">Card 1/20</span>
-                </div>
+
 
                 <!-- Flashcard -->
                 <div class="flashcard-container">
@@ -140,6 +145,13 @@
                                         <p id="definition-text" class="definition-text">To give up completely; to desert or leave behind</p>
                                     </div>
 
+                                    <div class="translation-section">
+                                        <h4>Translations</h4>
+                                        <div id="translations-container" class="translations-container">
+                                            <!-- Translations will be inserted here -->
+                                        </div>
+                                    </div>
+
                                     <div class="synonyms-section">
                                         <h4>Synonyms</h4>
                                         <div id="synonyms-container" class="synonyms-container">
@@ -166,21 +178,12 @@
 
                 <!-- Card Controls -->
                 <div class="card-controls">
-                    <div class="navigation-buttons">
-                        <button id="prev-btn" class="control-btn" aria-label="Previous card">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 18l-6-6 6-6"/>
-                            </svg>
-                            <span>Previous</span>
-                        </button>
-
-                        <button id="next-btn" class="control-btn" aria-label="Next card">
-                            <span>Next</span>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <button id="prev-btn" class="control-btn" aria-label="Previous card">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                        <span>Previous</span>
+                    </button>
 
                     <button id="mark-learned-btn" class="mark-learned-btn" aria-label="Mark as learned">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -188,6 +191,13 @@
                             <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
                         <span id="learned-text">Mark as Learned</span>
+                    </button>
+
+                    <button id="next-btn" class="control-btn" aria-label="Next card">
+                        <span>Next</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -356,6 +366,44 @@
                             <label class="toggle-switch">
                                 <input type="checkbox" id="theme-toggle">
                                 <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Flashcards</h3>
+                        <div class="setting-item">
+                            <label for="reverse-mode">
+                                <span>Reverse Card Mode</span>
+                                <p class="setting-description">Show definition first, reveal word on flip (for testing yourself)</p>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="reverse-mode">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Languages</h3>
+                        <div class="setting-item">
+                            <label>
+                                <span>Translation Languages</span>
+                                <p class="setting-description">Select which languages to display in flashcards</p>
+                            </label>
+                        </div>
+                        <div class="language-options">
+                            <label class="language-checkbox">
+                                <input type="checkbox" id="lang-hy" value="Hy" checked disabled>
+                                <span>Armenian (Default)</span>
+                            </label>
+                            <label class="language-checkbox">
+                                <input type="checkbox" id="lang-fa" value="Fa">
+                                <span>Persian (Farsi)</span>
+                            </label>
+                            <label class="language-checkbox">
+                                <input type="checkbox" id="lang-en" value="En">
+                                <span>English</span>
                             </label>
                         </div>
                     </div>

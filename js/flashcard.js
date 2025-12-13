@@ -208,6 +208,7 @@ const FlashcardMode = {
     const wordBack = document.getElementById('word-back');
     const partOfSpeech = document.getElementById('part-of-speech');
     const definitionText = document.getElementById('definition-text');
+    const translationsContainer = document.getElementById('translations-container');
     const synonymsContainer = document.getElementById('synonyms-container');
     const examplesContainer = document.getElementById('examples-container');
 
@@ -215,17 +216,83 @@ const FlashcardMode = {
     flashcard.classList.remove('flipped');
     this.isFlipped = false;
 
-    // Set front content
-    wordFront.textContent = word.word;
-    wordBack.textContent = word.word;
-    partOfSpeech.textContent = word.partOfSpeech || 'word';
+    // Check if reverse mode is enabled
+    const reverseMode = StorageService.getPreference('reverseMode') || false;
 
     // Set difficulty indicator
     const frontElement = flashcard.querySelector('.flashcard-front');
     frontElement.setAttribute('data-difficulty', word.difficulty);
 
-    // Set definition
+    if (reverseMode) {
+      // Reverse mode: show definition on front, word on back
+      wordFront.textContent = word.definition;
+      wordBack.textContent = word.word;
+      partOfSpeech.textContent = ''; // Hide part of speech on front in reverse mode
+
+      // Update tap hint
+      const tapHint = flashcard.querySelector('.tap-hint');
+      if (tapHint) tapHint.textContent = 'Tap to reveal word';
+    } else {
+      // Normal mode: show word on front
+      wordFront.textContent = word.word;
+      wordBack.textContent = word.word;
+      partOfSpeech.textContent = word.partOfSpeech || 'word';
+
+      // Update tap hint
+      const tapHint = flashcard.querySelector('.tap-hint');
+      if (tapHint) tapHint.textContent = 'Tap to flip';
+    }
+
+    // Set definition (for back side)
     definitionText.textContent = word.definition;
+
+    // Set translations
+    translationsContainer.innerHTML = '';
+    const translations = [];
+
+    // Get user's language preferences
+    const enabledLanguages = StorageService.getPreference('translationLanguages') || ['Hy'];
+
+    // Map of language codes to full names
+    const languageNames = {
+      'Fa': 'Persian',
+      'Hy': 'Armenian',
+      'En': 'English'
+    };
+
+    // Check for Persian translation
+    if (word.translationFa && enabledLanguages.includes('Fa')) {
+      translations.push({ lang: 'Fa', name: languageNames['Fa'], text: word.translationFa });
+    }
+
+    // Check for Armenian translation
+    if (word.translationHy && enabledLanguages.includes('Hy')) {
+      translations.push({ lang: 'Hy', name: languageNames['Hy'], text: word.translationHy });
+    }
+
+    // Check for English translation
+    if (word.translationEn && enabledLanguages.includes('En')) {
+      translations.push({ lang: 'En', name: languageNames['En'], text: word.translationEn });
+    }
+
+    // Render translations
+    translations.forEach(translation => {
+      const item = document.createElement('div');
+      item.className = 'translation-item';
+
+      const langLabel = document.createElement('span');
+      langLabel.className = 'translation-lang';
+      langLabel.textContent = translation.lang;
+      langLabel.title = translation.name;
+
+      const text = document.createElement('span');
+      text.className = 'translation-text';
+      text.textContent = translation.text;
+
+      item.appendChild(langLabel);
+      item.appendChild(text);
+      translationsContainer.appendChild(item);
+    });
 
     // Set synonyms
     synonymsContainer.innerHTML = '';
@@ -387,6 +454,13 @@ const FlashcardMode = {
     const current = this.currentWords.length > 0 ? this.currentIndex + 1 : 0;
     const total = this.currentWords.length;
     counter.textContent = `Card ${current}/${total}`;
+
+    // Update card progress bar
+    const cardProgressFill = document.getElementById('card-progress-fill');
+    if (cardProgressFill && total > 0) {
+      const percentage = (current / total) * 100;
+      cardProgressFill.style.width = `${percentage}%`;
+    }
   },
 
   // Update progress indicator in header
