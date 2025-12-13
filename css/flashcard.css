@@ -4,7 +4,8 @@
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  height: 420px;
+  /* Use design-system variables so height adapts by device */
+  height: 700px;
   perspective: 1500px;
 }
 
@@ -278,10 +279,6 @@
 
 /* Responsive */
 @media (max-width: 380px) {
-  .flashcard-container {
-    height: 380px;
-  }
-
   .word-text {
     font-size: 36px;
   }
@@ -300,17 +297,7 @@
   }
 }
 
-@media (min-width: 768px) {
-  .flashcard-container {
-    height: 480px;
-  }
-}
-
 @media (min-width: 1024px) {
-  .flashcard-container {
-    height: 520px;
-  }
-
   .flashcard:hover {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   }
