@@ -236,8 +236,8 @@
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 22px;
+  width: 36px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -253,7 +253,7 @@
   cursor: pointer;
   inset: 0;
   background-color: #d1d5db;
-  border-radius: 22px;
+  border-radius: 9999px;
   transition: background-color 0.2s ease;
 }
 
@@ -262,8 +262,8 @@
   position: absolute;
   height: 16px;
   width: 16px;
-  left: 3px;
-  top: 3px;
+  left: 2px;
+  top: 0px;
   background-color: white;
   border-radius: 50%;
   transition: transform 0.2s ease;
@@ -275,7 +275,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
-  transform: translateX(18px);
+  transform: translateX(16px);
 }
 
 /* Card Counter - Header Integration */
@@ -422,6 +422,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
+  margin-right: 5px
 }
 
 .speak-btn:hover {
@@ -465,6 +466,10 @@
 .setting-item label {
   flex: 1;
   cursor: pointer;
+}
+
+.setting-item .toggle-switch {
+  flex: 0 0 auto;
 }
 
 .setting-item label span {
