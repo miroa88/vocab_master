@@ -2,23 +2,23 @@
 
 const StatsMode = {
   // Initialize stats mode
-  init() {
-    this.render();
+  async init() {
+    await this.render();
   },
 
   // Render statistics
-  render() {
-    this.renderOverallProgress();
-    this.renderStreak();
-    this.renderWeeklyWords();
-    this.renderStudyTime();
-    this.renderQuizAverage();
-    this.renderRecentSessions();
+  async render() {
+    await this.renderOverallProgress();
+    await this.renderStreak();
+    await this.renderWeeklyWords();
+    await this.renderStudyTime();
+    await this.renderQuizAverage();
+    await this.renderRecentSessions();
   },
 
   // Render overall progress
-  renderOverallProgress() {
-    const stats = DataService.getStatistics();
+  async renderOverallProgress() {
+    const stats = await DataService.getStatistics();
     const percentage = document.getElementById('overall-percentage');
     const wordsCount = document.getElementById('words-learned-count');
     const progressCircle = document.getElementById('progress-circle');
@@ -41,8 +41,8 @@ const StatsMode = {
   },
 
   // Render study streak
-  renderStreak() {
-    const streak = StorageService.getStreak();
+  async renderStreak() {
+    const streak = await StorageService.getStreak();
     const streakCount = document.getElementById('streak-count');
 
     streakCount.textContent = `${streak} ${streak === 1 ? 'day' : 'days'}`;
@@ -63,24 +63,24 @@ const StatsMode = {
   },
 
   // Render words learned this week
-  renderWeeklyWords() {
-    const weekWords = StorageService.getWordsLearnedThisWeek();
+  async renderWeeklyWords() {
+    const weekWords = await StorageService.getWordsLearnedThisWeek();
     const weekWordsEl = document.getElementById('week-words');
 
     weekWordsEl.textContent = `${weekWords} ${weekWords === 1 ? 'word' : 'words'}`;
   },
 
   // Render total study time
-  renderStudyTime() {
-    const stats = StorageService.getStats();
+  async renderStudyTime() {
+    const stats = await StorageService.getStats();
     const totalTimeEl = document.getElementById('total-time');
 
     totalTimeEl.textContent = Utils.formatTime(stats.totalTimeSpent);
   },
 
   // Render average quiz score
-  renderQuizAverage() {
-    const average = StorageService.getAverageQuizScore();
+  async renderQuizAverage() {
+    const average = await StorageService.getAverageQuizScore();
     const quizAvgEl = document.getElementById('quiz-average');
 
     quizAvgEl.textContent = `${average}%`;
@@ -97,11 +97,12 @@ const StatsMode = {
   },
 
   // Render recent sessions
-  renderRecentSessions() {
-    const sessions = StorageService.getRecentSessions(5);
+  async renderRecentSessions() {
+    const sessions = await StorageService.getRecentSessions(5);
     const sessionsList = document.getElementById('sessions-list');
 
-    if (sessions.length === 0) {
+    // Ensure sessions is an array
+    if (!Array.isArray(sessions) || sessions.length === 0) {
       sessionsList.innerHTML = '<p class="empty-state">No study sessions yet. Start learning to see your history!</p>';
       return;
     }
@@ -146,7 +147,7 @@ const StatsMode = {
   },
 
   // Refresh stats (called when view becomes active)
-  refresh() {
-    this.render();
+  async refresh() {
+    await this.render();
   }
 };
