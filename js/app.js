@@ -14,7 +14,7 @@ const App = {
       this.setupUserManagement();
 
       // Check if user is selected
-      const currentUserId = StorageService.initUserSystem();
+      const currentUserId = await StorageService.initUserSystem();
       if (!currentUserId) {
         this.hideLoading();
         this.showUserModal();
@@ -22,7 +22,7 @@ const App = {
       }
 
       // Update user display
-      this.updateUserDisplay();
+      await this.updateUserDisplay();
 
       // Load vocabulary data
       const loaded = await DataService.load();
@@ -40,20 +40,20 @@ const App = {
       this.setupNavigation();
 
       // Setup settings
-      this.setupSettings();
+      await this.setupSettings();
 
       // Apply saved theme
-      this.applyTheme();
+      await this.applyTheme();
 
       // Start session tracking
       this.startSession();
 
       // Update initial stats
-      StatsMode.refresh();
+      await StatsMode.refresh();
 
       this.hideLoading();
 
-      const user = StorageService.getCurrentUser();
+      const user = await StorageService.getCurrentUser();
       Utils.showToast(`Welcome back, ${user.name}!`, 'success');
 
     } catch (error) {
@@ -111,7 +111,7 @@ const App = {
   },
 
   // Setup settings
-  setupSettings() {
+  async setupSettings() {
     const themeToggle = document.getElementById('theme-toggle');
     const speechRateSlider = document.getElementById('speech-rate');
     const speechRateValue = document.getElementById('speech-rate-value');
@@ -128,19 +128,19 @@ const App = {
     const langEn = document.getElementById('lang-en');
 
     // Load saved language preferences
-    const savedLanguages = StorageService.getPreference('translationLanguages') || ['Hy'];
+    const savedLanguages = await StorageService.getPreference('translationLanguages') || ['Hy'];
     langHy.checked = savedLanguages.includes('Hy');
     langFa.checked = savedLanguages.includes('Fa');
     langEn.checked = savedLanguages.includes('En');
 
     // Language preference change handlers
-    const updateLanguagePreferences = () => {
+    const updateLanguagePreferences = async () => {
       const enabledLanguages = [];
       if (langHy.checked) enabledLanguages.push('Hy');
       if (langFa.checked) enabledLanguages.push('Fa');
       if (langEn.checked) enabledLanguages.push('En');
 
-      StorageService.updatePreference('translationLanguages', enabledLanguages);
+      await StorageService.updatePreference('translationLanguages', enabledLanguages);
 
       // Refresh flashcard display
       if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
@@ -152,8 +152,8 @@ const App = {
     langEn.addEventListener('change', updateLanguagePreferences);
 
     // Reverse mode toggle
-    reverseModeToggle.addEventListener('change', (e) => {
-      StorageService.updatePreference('reverseMode', e.target.checked);
+    reverseModeToggle.addEventListener('change', async (e) => {
+      await StorageService.updatePreference('reverseMode', e.target.checked);
       // Refresh flashcard display
       if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
         FlashcardMode.renderCard();
@@ -161,7 +161,7 @@ const App = {
     });
 
     // Load saved reverse mode preference
-    const savedReverseMode = StorageService.getPreference('reverseMode');
+    const savedReverseMode = await StorageService.getPreference('reverseMode');
     reverseModeToggle.checked = savedReverseMode;
 
     // Theme toggle
@@ -183,39 +183,39 @@ const App = {
     speechRateValue.textContent = `${savedRate}x`;
 
     // Auto-play toggle
-    autoPlayToggle.addEventListener('change', (e) => {
-      StorageService.updatePreference('autoPlay', e.target.checked);
+    autoPlayToggle.addEventListener('change', async (e) => {
+      await StorageService.updatePreference('autoPlay', e.target.checked);
     });
 
     // Load saved auto-play preference
-    const savedAutoPlay = StorageService.getPreference('autoPlay');
+    const savedAutoPlay = await StorageService.getPreference('autoPlay');
     autoPlayToggle.checked = savedAutoPlay;
 
     // Certification Key
-    const savedCertKey = StorageService.getPreference('certificationKey');
+    const savedCertKey = await StorageService.getPreference('certificationKey');
     if (savedCertKey) {
       certificationKeyInput.value = savedCertKey;
     }
 
-    saveCertKeyBtn.addEventListener('click', () => {
+    saveCertKeyBtn.addEventListener('click', async () => {
       const certKey = certificationKeyInput.value.trim();
       if (!certKey) {
         Utils.showToast('Please enter a certification key', 'error');
         return;
       }
-      StorageService.updatePreference('certificationKey', certKey);
+      await StorageService.updatePreference('certificationKey', certKey);
       Utils.showToast('Certification Key saved! The app is now authorized.', 'success');
     });
 
     // Export button
-    exportBtn.addEventListener('click', () => {
-      StorageService.exportData();
+    exportBtn.addEventListener('click', async () => {
+      await StorageService.exportData();
       Utils.showToast('Progress exported!', 'success');
     });
 
     // Reset button
-    resetBtn.addEventListener('click', () => {
-      const confirmed = StorageService.reset();
+    resetBtn.addEventListener('click', async () => {
+      const confirmed = await StorageService.reset();
       if (confirmed) {
         // Reload page to reset everything
         window.location.reload();
@@ -224,9 +224,9 @@ const App = {
   },
 
   // Set theme
-  setTheme(theme) {
+  async setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    StorageService.updatePreference('theme', theme);
+    await StorageService.updatePreference('theme', theme);
 
     // Update toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -234,9 +234,9 @@ const App = {
   },
 
   // Apply saved theme
-  applyTheme() {
-    const savedTheme = StorageService.getPreference('theme') || 'light';
-    this.setTheme(savedTheme);
+  async applyTheme() {
+    const savedTheme = await StorageService.getPreference('theme') || 'light';
+    await this.setTheme(savedTheme);
   },
 
   // Start session tracking
@@ -262,16 +262,16 @@ const App = {
   },
 
   // Update current session
-  updateSession() {
+  async updateSession() {
     if (!this.sessionStartTime) return;
 
     const duration = Math.floor((Date.now() - this.sessionStartTime) / 1000);
 
     // Only save if session is meaningful (at least 10 seconds)
     if (duration >= 10) {
-      const stats = DataService.getStatistics();
+      const stats = await DataService.getStatistics();
 
-      StorageService.addSession({
+      await StorageService.addSession({
         duration: duration,
         wordsStudied: stats.total,
         wordsLearned: 0, // Updated when words are marked
@@ -280,7 +280,7 @@ const App = {
       });
 
       // Update streak
-      StorageService.updateStreak();
+      await StorageService.updateStreak();
 
       // Reset session start time
       this.sessionStartTime = Date.now();
@@ -321,12 +321,12 @@ const App = {
   },
 
   // Show user modal
-  showUserModal() {
+  async showUserModal() {
     const modal = document.getElementById('user-modal');
     const userList = document.getElementById('user-list');
 
     // Get all users
-    const users = StorageService.getAllUsers();
+    const users = await StorageService.getAllUsers();
     const currentUserId = StorageService.currentUserId;
 
     // Clear and populate user list
@@ -335,11 +335,11 @@ const App = {
     if (users.length === 0) {
       userList.innerHTML = '<p class="empty-state">No users yet. Create one below!</p>';
     } else {
-      users.forEach(user => {
+      for (const user of users) {
         // Get user stats
         const oldUserId = StorageService.currentUserId;
         StorageService.currentUserId = user.id;
-        const learnedCount = StorageService.getLearnedCount();
+        const learnedCount = await StorageService.getLearnedCount();
         StorageService.currentUserId = oldUserId;
 
         const userItem = document.createElement('div');
@@ -371,7 +371,7 @@ const App = {
         });
 
         userList.appendChild(userItem);
-      });
+      }
     }
 
     modal.classList.add('show');
@@ -384,7 +384,7 @@ const App = {
   },
 
   // Create new user
-  createNewUser() {
+  async createNewUser() {
     const input = document.getElementById('new-user-name');
     const name = input.value.trim();
 
@@ -393,7 +393,7 @@ const App = {
       return;
     }
 
-    const userId = StorageService.addUser(name);
+    const userId = await StorageService.addUser(name);
     this.selectUser(userId);
     input.value = '';
   },
@@ -408,28 +408,28 @@ const App = {
   },
 
   // Delete user
-  deleteUser(userId) {
-    const users = StorageService.getAllUsers();
+  async deleteUser(userId) {
+    const users = await StorageService.getAllUsers();
     const user = users.find(u => u.id === userId);
 
     if (!user) return;
 
     if (confirm(`Are you sure you want to delete ${user.name}'s profile? This cannot be undone.`)) {
-      StorageService.deleteUser(userId);
+      await StorageService.deleteUser(userId);
 
       // If we deleted the current user, show modal to select another
       if (StorageService.currentUserId === null) {
-        this.showUserModal();
+        await this.showUserModal();
       } else {
         // Just refresh the modal
-        this.showUserModal();
+        await this.showUserModal();
       }
     }
   },
 
   // Update user display
-  updateUserDisplay() {
-    const user = StorageService.getCurrentUser();
+  async updateUserDisplay() {
+    const user = await StorageService.getCurrentUser();
     if (user) {
       document.getElementById('current-user-name').textContent = user.name;
     }

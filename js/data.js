@@ -4,10 +4,46 @@ const DataService = {
   vocabulary: [],
   metadata: {},
   loaded: false,
+  useMongoDB: false,
 
-  // Load vocabulary from JSON file
+  // Initialize data service
+  init() {
+    this.useMongoDB = window.AppConfig?.USE_MONGODB ?? false;
+    console.log(`DataService initialized: ${this.useMongoDB ? 'MongoDB' : 'local JSON'} mode`);
+  },
+
+  // Load vocabulary from MongoDB API or JSON file
   async load() {
+    if (this.useMongoDB) {
+      try {
+        console.log('Loading vocabulary from MongoDB API...');
+
+        // Load vocabulary and metadata in parallel
+        const [vocabs, metadata] = await Promise.all([
+          ApiClient.getAllVocabs(),
+          ApiClient.getVocabMetadata()
+        ]);
+
+        this.vocabulary = vocabs || [];
+        this.metadata = metadata || {};
+        this.loaded = true;
+
+        console.log(`Loaded ${this.vocabulary.length} words from MongoDB`);
+        return true;
+
+      } catch (error) {
+        console.warn('MongoDB API failed, falling back to local JSON:', error);
+        return this._loadFromJSON();
+      }
+    }
+
+    return this._loadFromJSON();
+  },
+
+  // Fallback: Load from local JSON file
+  async _loadFromJSON() {
     try {
+      console.log('Loading vocabulary from local vocab.json...');
       const response = await fetch('vocab.json');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -16,6 +52,8 @@ const DataService = {
       this.vocabulary = data.words || [];
       this.metadata = data.metadata || {};
       this.loaded = true;
+
+      console.log(`Loaded ${this.vocabulary.length} words from local JSON`);
       return true;
     } catch (error) {
       console.error('Error loading vocabulary:', error);
@@ -55,14 +93,14 @@ const DataService = {
   },
 
   // Get unlearned words
-  getUnlearnedWords() {
-    const learnedIds = StorageService.getLearnedIds();
+  async getUnlearnedWords() {
+    const learnedIds = await StorageService.getLearnedIds();
     return this.vocabulary.filter(word => !learnedIds.includes(word.id));
   },
 
   // Get learned words
-  getLearnedWords() {
-    const learnedIds = StorageService.getLearnedIds();
+  async getLearnedWords() {
+    const learnedIds = await StorageService.getLearnedIds();
     return this.vocabulary.filter(word => learnedIds.includes(word.id));
   },
 
@@ -82,7 +120,7 @@ const DataService = {
   },
 
   // Get filtered words
-  getFiltered(filters) {
+  async getFiltered(filters) {
     let words = [...this.vocabulary];
 
     // Apply search filter
@@ -97,7 +135,7 @@ const DataService = {
 
     // Apply status filter
     if (filters.status && filters.status !== 'all') {
-      const learnedIds = StorageService.getLearnedIds();
+      const learnedIds = await StorageService.getLearnedIds();
       words = Utils.filterByStatus(words, filters.status, learnedIds);
     }
 
@@ -105,10 +143,10 @@ const DataService = {
   },
 
   // Get words for quiz
-  getQuizWords(count = 10, onlyUnlearned = false) {
+  async getQuizWords(count = 10, onlyUnlearned = false) {
     let words;
     if (onlyUnlearned) {
-      words = this.getUnlearnedWords();
+      words = await this.getUnlearnedWords();
     } else {
       words = this.vocabulary;
     }
@@ -120,13 +158,6 @@ const DataService = {
     // Get random words
     const quizWords = Utils.getRandomItems(words, Math.min(count, words.length));
     return quizWords;
-  },
-
-  // Get all learned words for the current user
-  getLearnedWords() {
-    const learnedIds = StorageService.getLearnedIds();
-    if (!learnedIds || learnedIds.length === 0) return [];
-    return this.vocabulary.filter(word => learnedIds.includes(word.id));
   },
 
   // Get academically relevant distractors for a multiple-choice question
@@ -159,12 +190,12 @@ const DataService = {
   },
 
   // Get words that need review (based on quiz performance)
-  getWordsNeedingReview(count = 10) {
-    const wordsWithScores = this.vocabulary.map(word => {
-      const score = StorageService.getQuizScore(word.id);
+  async getWordsNeedingReview(count = 10) {
+    const wordsWithScores = await Promise.all(this.vocabulary.map(async word => {
+      const score = await StorageService.getQuizScore(word.id);
       const successRate = score.attempts > 0 ? score.correct / score.attempts : 1;
       return { word, successRate, attempts: score.attempts };
-    });
+    }));
 
     // Sort by success rate (ascending) and filter out words with no attempts or high success
     const needReview = wordsWithScores
@@ -175,14 +206,14 @@ const DataService = {
   },
 
   // Get challenging words
-  getChallengingWords(count = 5) {
+  async getChallengingWords(count = 5) {
     return this.getWordsNeedingReview(count);
   },
 
   // Get statistics
-  getStatistics() {
+  async getStatistics() {
     const total = this.vocabulary.length;
-    const learned = StorageService.getLearnedCount();
+    const learned = await StorageService.getLearnedCount();
     const unlearned = total - learned;
 
     const byDifficulty = {
@@ -205,3 +236,12 @@ const DataService = {
     return this.loaded;
   }
 };
+
+// Initialize on load
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => DataService.init());
+  } else {
+    DataService.init();
+  }
+}
