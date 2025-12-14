@@ -15,34 +15,29 @@ const ApiClient = {
   },
 
   /**
-   * Get certificate from storage
+   * Get JWT token from localStorage
    */
-  getCertificate() {
+  getToken() {
     try {
-      // Try to get from current user's preferences
-      const currentUserId = localStorage.getItem('vocabCurrentUser');
-      if (currentUserId) {
-        const progressKey = `vocabProgress_${currentUserId}`;
-        const progress = JSON.parse(localStorage.getItem(progressKey) || '{}');
-        if (progress.preferences && progress.preferences.certificationKey) {
-          return progress.preferences.certificationKey;
-        }
-      }
-
-      // Fallback: try to get from any user
-      const users = JSON.parse(localStorage.getItem('vocabUsers') || '[]');
-      for (const user of users) {
-        const progressKey = `vocabProgress_${user.id}`;
-        const progress = JSON.parse(localStorage.getItem(progressKey) || '{}');
-        if (progress.preferences && progress.preferences.certificationKey) {
-          return progress.preferences.certificationKey;
-        }
-      }
-
-      return null;
+      return localStorage.getItem('authToken');
     } catch (error) {
-      console.warn('Could not retrieve certificate:', error);
+      console.warn('Could not retrieve token:', error);
       return null;
+    }
+  },
+
+  /**
+   * Set JWT token in localStorage
+   */
+  setToken(token) {
+    try {
+      if (token) {
+        localStorage.setItem('authToken', token);
+      } else {
+        localStorage.removeItem('authToken');
+      }
+    } catch (error) {
+      console.error('Could not store token:', error);
     }
   },
 
@@ -57,11 +52,11 @@ const ApiClient = {
       ...options.headers
     };
 
-    // Add certificate for authenticated requests
-    if (options.requiresCert !== false) {
-      const cert = this.getCertificate();
-      if (cert) {
-        headers['x-cert-key'] = cert;
+    // Add JWT token for authenticated requests
+    if (options.requiresAuth !== false) {
+      const token = this.getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
     }
 
@@ -124,16 +119,36 @@ const ApiClient = {
   /**
    * User Management APIs
    */
-  async registerUser(username) {
-    return this.post('/api/auth/register', { username }, { requiresCert: false });
+  async registerUser(username, password) {
+    const response = await this.post('/api/auth/register', { username, password }, { requiresAuth: false });
+    if (response.token) {
+      this.setToken(response.token);
+    }
+    return response;
   },
 
-  async loginUser(username) {
-    return this.post('/api/auth/login', { username }, { requiresCert: false });
+  async loginUser(username, password) {
+    const response = await this.post('/api/auth/login', { username, password }, { requiresAuth: false });
+    if (response.token) {
+      this.setToken(response.token);
+    }
+    return response;
+  },
+
+  async setupPassword(username, password) {
+    const response = await this.post('/api/auth/setup-password', { username, password }, { requiresAuth: false });
+    if (response.token) {
+      this.setToken(response.token);
+    }
+    return response;
+  },
+
+  logout() {
+    this.setToken(null);
   },
 
   async getAllUsers() {
-    return this.get('/api/users', { requiresCert: false });
+    return this.get('/api/users', { requiresAuth: false });
   },
 
   async getUser(userId) {
@@ -201,26 +216,26 @@ const ApiClient = {
    * Vocabulary APIs
    */
   async getAllVocabs() {
-    return this.get('/api/vocabs', { requiresCert: false });
+    return this.get('/api/vocabs', { requiresAuth: false });
   },
 
   async getVocab(id) {
-    return this.get(`/api/vocabs/${id}`, { requiresCert: false });
+    return this.get(`/api/vocabs/${id}`, { requiresAuth: false });
   },
 
   async searchVocabs(query) {
-    return this.get(`/api/vocabs/search?q=${encodeURIComponent(query)}`, { requiresCert: false });
+    return this.get(`/api/vocabs/search?q=${encodeURIComponent(query)}`, { requiresAuth: false });
   },
 
   async getVocabMetadata() {
-    return this.get('/api/vocabs/metadata', { requiresCert: false });
+    return this.get('/api/vocabs/metadata', { requiresAuth: false });
   },
 
   /**
    * Migration APIs
    */
   async importLocalStorageData(data) {
-    return this.post('/api/migration/import', data, { requiresCert: false });
+    return this.post('/api/migration/import', data, { requiresAuth: false });
   },
 
   async exportUserData(userId) {

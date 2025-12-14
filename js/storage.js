@@ -58,23 +58,26 @@ const StorageService = {
     }
   },
 
-  // Add new user
-  async addUser(userName) {
+  // Add new user (register with password)
+  async addUser(userName, password) {
+    if (!password) {
+      throw new Error('Password is required to create an account');
+    }
+
     if (this.useMongoDB) {
       try {
-        const result = await ApiClient.registerUser(userName);
+        const result = await ApiClient.registerUser(userName, password);
         const userId = result.user.userId;
 
-        // Also save to localStorage for fallback
-        this._addUserLocal(userName, userId);
+        // Save userId to localStorage
+        this.setCurrentUser(userId);
 
         return userId;
       } catch (error) {
-        console.warn('MongoDB API failed, falling back to localStorage:', error);
-        return this._addUserLocal(userName);
+        throw new Error(`Failed to register: ${error.message}`);
       }
     }
-    return this._addUserLocal(userName);
+    throw new Error('MongoDB mode required for user registration');
   },
 
   _addUserLocal(userName, userId = null) {
