@@ -46,15 +46,14 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
-    // CERTIFICATION TEMPORARILY DISABLED FOR TESTING
-    const certKey = StorageService.getPreference('certificationKey') || 'TESTING_NO_CERT';
-    // if (!certKey) {
-    //   Utils.showToast('Add your certification key in Settings to enable cloud TTS. Using browser voice.', 'info');
-    //   return this.speakWithBrowser(text, options);
-    // }
+    const certificate = StorageService.getPreference('certificationKey');
+    if (!certificate) {
+      Utils.showToast('Add your certificate in Settings to enable cloud TTS. Using browser voice.', 'info');
+      return this.speakWithBrowser(text, options);
+    }
 
     try {
-      await this.speakWithBackend(text, certKey, options);
+      await this.speakWithBackend(text, certificate, options);
       return true;
     } catch (error) {
       console.error('Backend TTS failed, falling back to browser speech', error);
@@ -63,21 +62,19 @@ const SpeechService = {
     }
   },
 
-  // Speak with secured backend TTS
-  async speakWithBackend(text, certKey, options = {}) {
+  // Speak with certificate-protected backend TTS
+  async speakWithBackend(text, certificate, options = {}) {
     const baseUrl = (window.AppConfig && window.AppConfig.TTS_BASE_URL) || 'https://vocab-master-backend.onrender.com';
     const url = `${baseUrl.replace(/\/$/, '')}/synthesize`;
-    const deviceInfo = (window.DeviceFingerprint && window.DeviceFingerprint.getDeviceInfo()) || {};
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'X-Cert-Key': certKey  // TEMPORARILY DISABLED FOR TESTING
+        'X-Cert-Key': certificate
       },
       body: JSON.stringify({
-        text,
-        deviceInfo
+        text
       }),
     });
 
