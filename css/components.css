@@ -500,6 +500,29 @@
   max-width: 200px;
 }
 
+/* Server Mode Select */
+.server-mode-select {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background-color: var(--background);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.server-mode-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.server-mode-select:hover {
+  border-color: var(--primary);
+}
+
 /* API Key Setting */
 .api-key-setting {
   flex-direction: column;

@@ -64,7 +64,7 @@ const SpeechService = {
 
   // Speak with secured backend TTS
   async speakWithBackend(text, certKey, options = {}) {
-    const baseUrl = window.TTS_BASE_URL || 'http://localhost:3000';
+    const baseUrl = (window.AppConfig && window.AppConfig.TTS_BASE_URL) || 'https://vocab-master-backend.onrender.com';
     const url = `${baseUrl.replace(/\/$/, '')}/synthesize`;
     const deviceInfo = (window.DeviceFingerprint && window.DeviceFingerprint.getDeviceInfo()) || {};
 
