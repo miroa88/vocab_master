@@ -226,6 +226,22 @@
     min-width: 100%;
   }
 
+  /* Keep filter pills on a single row with horizontal scroll */
+  .filter-options {
+    flex-wrap: nowrap;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-direction: row;
+  }
+
+  .filter-option {
+    white-space: nowrap;
+    padding: 5px 8px;
+    font-size: calc(var(--font-size-xs) - 1px);
+    flex: 0 0 auto;
+  }
+
   .card-controls {
     flex-direction: column;
     gap: var(--space-sm);
@@ -248,6 +264,22 @@
 
   .stat-card.large {
     grid-column: 1 / -1;
+  }
+
+  /* Keep filter pills on one line with scroll */
+  .filter-options {
+    flex-wrap: nowrap;
+    flex-direction: row;
+    gap: var(--space-xxs, 6px);
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .filter-option {
+    white-space: nowrap;
+    padding: 5px 8px;
+    font-size: calc(var(--font-size-xs) - 1px);
+    flex: 0 0 auto;
   }
 }
 

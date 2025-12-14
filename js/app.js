@@ -371,6 +371,10 @@ const App = {
       // Enable/disable translation toggle based on reverse mode
       if (frontTranslationToggle) {
         frontTranslationToggle.disabled = !e.target.checked;
+        if (!e.target.checked) {
+          frontTranslationToggle.checked = false;
+          await StorageService.updatePreference('showFrontTranslation', false);
+        }
       }
       if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
         FlashcardMode.renderCard();
@@ -387,7 +391,7 @@ const App = {
     // Front translation toggle
     if (frontTranslationToggle) {
       const savedFrontTranslation = await StorageService.getPreference('showFrontTranslation');
-      frontTranslationToggle.checked = savedFrontTranslation !== false; // default true
+      frontTranslationToggle.checked = savedReverseMode && (savedFrontTranslation !== false); // default true when reverse is on
 
       frontTranslationToggle.addEventListener('change', async (e) => {
         await StorageService.updatePreference('showFrontTranslation', e.target.checked);

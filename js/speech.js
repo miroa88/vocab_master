@@ -9,7 +9,7 @@ const SpeechService = {
     rate: 0.9,
     pitch: 1,
     volume: 1,
-    voice: null
+    voice: null,
   },
 
   // Initialize speech service
@@ -21,7 +21,7 @@ const SpeechService = {
       }
     }
 
-    const savedRate = await StorageService.getPreference('speechRate');
+    const savedRate = await StorageService.getPreference("speechRate");
     if (savedRate) {
       this.settings.rate = savedRate;
     }
@@ -31,14 +31,21 @@ const SpeechService = {
 
   // Check if browser supports speech synthesis
   isSupported() {
-    return 'speechSynthesis' in window;
+    return "speechSynthesis" in window;
   },
 
   // Load available voices
   loadVoices() {
     this.voices = this.synth.getVoices();
-    const englishVoices = this.voices.filter(voice => voice.lang.startsWith('en'));
-    const usVoice = englishVoices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google')) || englishVoices.find(voice => voice.lang === 'en-US') || englishVoices[0];
+    const englishVoices = this.voices.filter((voice) =>
+      voice.lang.startsWith("en")
+    );
+    const usVoice =
+      englishVoices.find(
+        (voice) => voice.lang === "en-US" && voice.name.includes("Google")
+      ) ||
+      englishVoices.find((voice) => voice.lang === "en-US") ||
+      englishVoices[0];
     if (usVoice) {
       this.settings.voice = usVoice;
     }
@@ -46,9 +53,12 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
-    const certificate = await StorageService.getPreference('certificationKey');
+    const certificate = await StorageService.getPreference("certificationKey");
     if (!certificate) {
-      Utils.showToast('Add your certificate in Settings to enable cloud TTS. Using browser voice.', 'info');
+      Utils.showToast(
+        "Add your certificate in Settings to enable cloud TTS. Using browser voice.",
+        "info"
+      );
       return this.speakWithBrowser(text, options);
     }
 
@@ -56,25 +66,30 @@ const SpeechService = {
       await this.speakWithBackend(text, certificate, options);
       return true;
     } catch (error) {
-      console.error('Backend TTS failed, falling back to browser speech', error);
-      Utils.showToast('Cloud TTS failed, using browser voice', 'error');
+      console.error(
+        "Backend TTS failed, falling back to browser speech",
+        error
+      );
+      Utils.showToast("Cloud TTS failed, using browser voice", "error");
       return this.speakWithBrowser(text, options);
     }
   },
 
   // Speak with certificate-protected backend TTS
   async speakWithBackend(text, certificate, options = {}) {
-    const baseUrl = (window.AppConfig && window.AppConfig.TTS_BASE_URL) || 'https://vocab-master-backend.onrender.com';
-    const url = `${baseUrl.replace(/\/$/, '')}/synthesize`;
+    const baseUrl =
+      (window.AppConfig && window.AppConfig.API_BASE_URL) ||
+      "https://vocab-master-backend.onrender.com";
+    const url = `${baseUrl.replace(/\/$/, "")}/synthesize`;
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-Cert-Key': certificate
+        "Content-Type": "application/json",
+        "X-Cert-Key": certificate,
       },
       body: JSON.stringify({
-        text
+        text,
       }),
     });
 
@@ -102,7 +117,7 @@ const SpeechService = {
   // Speak with browser's Web Speech API
   speakWithBrowser(text, options = {}) {
     if (!this.isSupported()) {
-      console.warn('Speech synthesis not available');
+      console.warn("Speech synthesis not available");
       return false;
     }
 
@@ -129,7 +144,7 @@ const SpeechService = {
     };
 
     utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
+      console.error("Speech synthesis error:", event);
       this.currentUtterance = null;
       if (options.onError) options.onError(event);
     };
@@ -138,7 +153,7 @@ const SpeechService = {
       this.synth.speak(utterance);
       return true;
     } catch (error) {
-      console.error('Error speaking:', error);
+      console.error("Error speaking:", error);
       return false;
     }
   },
@@ -172,7 +187,7 @@ const SpeechService = {
 
   async setRate(rate) {
     this.settings.rate = Math.max(0.5, Math.min(1.5, rate));
-    await StorageService.updatePreference('speechRate', this.settings.rate);
+    await StorageService.updatePreference("speechRate", this.settings.rate);
   },
 
   getRate() {
@@ -189,5 +204,5 @@ const SpeechService = {
 
   getVoices() {
     return this.voices;
-  }
+  },
 };

@@ -10,8 +10,9 @@ const ApiClient = {
    * Initialize API client
    */
   init() {
-    this.baseURL = window.AppConfig.API_BASE_URL || window.AppConfig.TTS_BASE_URL;
-    console.log('API Client initialized with base URL:', this.baseURL);
+    this.baseURL =
+      window.AppConfig.API_BASE_URL || window.AppConfig.API_BASE_URL;
+    console.log("API Client initialized with base URL:", this.baseURL);
   },
 
   /**
@@ -19,9 +20,9 @@ const ApiClient = {
    */
   getToken() {
     try {
-      return localStorage.getItem('authToken');
+      return localStorage.getItem("authToken");
     } catch (error) {
-      console.warn('Could not retrieve token:', error);
+      console.warn("Could not retrieve token:", error);
       return null;
     }
   },
@@ -32,12 +33,12 @@ const ApiClient = {
   setToken(token) {
     try {
       if (token) {
-        localStorage.setItem('authToken', token);
+        localStorage.setItem("authToken", token);
       } else {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem("authToken");
       }
     } catch (error) {
-      console.error('Could not store token:', error);
+      console.error("Could not store token:", error);
     }
   },
 
@@ -48,29 +49,29 @@ const ApiClient = {
     const url = this.baseURL + endpoint;
 
     const headers = {
-      'Content-Type': 'application/json',
-      ...options.headers
+      "Content-Type": "application/json",
+      ...options.headers,
     };
 
     // Add JWT token for authenticated requests
     if (options.requiresAuth !== false) {
       const token = this.getToken();
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
     }
 
     const config = {
       method,
       headers,
-      ...(data && { body: JSON.stringify(data) })
+      ...(data && { body: JSON.stringify(data) }),
     };
 
     try {
       const response = await fetch(url, config);
 
       // Handle non-JSON responses (like audio)
-      if (options.responseType === 'blob') {
+      if (options.responseType === "blob") {
         if (!response.ok) {
           const text = await response.text();
           const error = new Error(`API Error (${response.status}): ${text}`);
@@ -85,14 +86,17 @@ const ApiClient = {
       const responseData = await response.json();
 
       if (!response.ok) {
-        const error = new Error(responseData.message || responseData.error || `API Error (${response.status})`);
+        const error = new Error(
+          responseData.message ||
+            responseData.error ||
+            `API Error (${response.status})`
+        );
         error.status = response.status;
         error.details = responseData;
         throw error;
       }
 
       return responseData;
-
     } catch (error) {
       console.error(`API Request failed [${method} ${endpoint}]:`, error);
       throw error;
@@ -103,30 +107,34 @@ const ApiClient = {
    * HTTP Methods
    */
   get(endpoint, options = {}) {
-    return this.request('GET', endpoint, null, options);
+    return this.request("GET", endpoint, null, options);
   },
 
   post(endpoint, data, options = {}) {
-    return this.request('POST', endpoint, data, options);
+    return this.request("POST", endpoint, data, options);
   },
 
   put(endpoint, data, options = {}) {
-    return this.request('PUT', endpoint, data, options);
+    return this.request("PUT", endpoint, data, options);
   },
 
   patch(endpoint, data, options = {}) {
-    return this.request('PATCH', endpoint, data, options);
+    return this.request("PATCH", endpoint, data, options);
   },
 
   delete(endpoint, options = {}) {
-    return this.request('DELETE', endpoint, null, options);
+    return this.request("DELETE", endpoint, null, options);
   },
 
   /**
    * User Management APIs
    */
   async registerUser(username, password) {
-    const response = await this.post('/api/auth/register', { username, password }, { requiresAuth: false });
+    const response = await this.post(
+      "/api/auth/register",
+      { username, password },
+      { requiresAuth: false }
+    );
     if (response.token) {
       this.setToken(response.token);
     }
@@ -134,7 +142,11 @@ const ApiClient = {
   },
 
   async loginUser(username, password) {
-    const response = await this.post('/api/auth/login', { username, password }, { requiresAuth: false });
+    const response = await this.post(
+      "/api/auth/login",
+      { username, password },
+      { requiresAuth: false }
+    );
     if (response.token) {
       this.setToken(response.token);
     }
@@ -142,7 +154,11 @@ const ApiClient = {
   },
 
   async setupPassword(username, password) {
-    const response = await this.post('/api/auth/setup-password', { username, password }, { requiresAuth: false });
+    const response = await this.post(
+      "/api/auth/setup-password",
+      { username, password },
+      { requiresAuth: false }
+    );
     if (response.token) {
       this.setToken(response.token);
     }
@@ -154,7 +170,7 @@ const ApiClient = {
   },
 
   async getAllUsers() {
-    return this.get('/api/users', { requiresAuth: false });
+    return this.get("/api/users", { requiresAuth: false });
   },
 
   async getUser(userId) {
@@ -222,7 +238,7 @@ const ApiClient = {
    * Vocabulary APIs
    */
   async getAllVocabs() {
-    return this.get('/api/vocabs', { requiresAuth: false });
+    return this.get("/api/vocabs", { requiresAuth: false });
   },
 
   async getVocab(id) {
@@ -230,29 +246,31 @@ const ApiClient = {
   },
 
   async searchVocabs(query) {
-    return this.get(`/api/vocabs/search?q=${encodeURIComponent(query)}`, { requiresAuth: false });
+    return this.get(`/api/vocabs/search?q=${encodeURIComponent(query)}`, {
+      requiresAuth: false,
+    });
   },
 
   async getVocabMetadata() {
-    return this.get('/api/vocabs/metadata', { requiresAuth: false });
+    return this.get("/api/vocabs/metadata", { requiresAuth: false });
   },
 
   /**
    * Migration APIs
    */
   async importLocalStorageData(data) {
-    return this.post('/api/migration/import', data, { requiresAuth: false });
+    return this.post("/api/migration/import", data, { requiresAuth: false });
   },
 
   async exportUserData(userId) {
     return this.get(`/api/users/${userId}/export`);
-  }
+  },
 };
 
 // Initialize on load
-if (typeof window !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => ApiClient.init());
+if (typeof window !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => ApiClient.init());
   } else {
     ApiClient.init();
   }

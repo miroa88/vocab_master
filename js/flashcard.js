@@ -82,10 +82,10 @@ const FlashcardMode = {
     filterBtn.addEventListener('click', () => this.toggleFilterPanel());
 
     // Search input
-    const debouncedSearch = Utils.debounce((value) => {
+    const debouncedSearch = Utils.debounce(async (value) => {
       this.filters.search = value;
-      this.loadWords();
-      this.renderCard();
+      await this.loadWords();
+      await this.renderCard();
       this.updateCardCounter();
     }, 300);
 
@@ -171,6 +171,12 @@ const FlashcardMode = {
       const flashcardView = document.getElementById('flashcard-view');
       if (!flashcardView.classList.contains('active')) return;
 
+      // Ignore shortcuts while typing in inputs/textareas or editable elements
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) {
+        return;
+      }
+
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
@@ -223,6 +229,9 @@ const FlashcardMode = {
     // Check if reverse mode is enabled
     const reverseMode = await StorageService.getPreference('reverseMode') || false;
     const showFrontTranslation = reverseMode && (await StorageService.getPreference('showFrontTranslation') !== false);
+
+    // Toggle reverse-mode class for styling adjustments
+    flashcard.classList.toggle('reverse-mode', reverseMode);
 
     // Set difficulty indicator
     const frontElement = flashcard.querySelector('.flashcard-front');

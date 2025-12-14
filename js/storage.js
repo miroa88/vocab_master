@@ -10,11 +10,21 @@ const StorageService = {
   currentUsername: null,
   progressCache: null,
   useMongoDB: false,
+  mongoDisabled: false,
 
   // Initialize storage service
   init() {
     this.useMongoDB = window.AppConfig?.USE_MONGODB ?? false;
+    this.mongoDisabled = false;
     console.log(`Storage initialized: ${this.useMongoDB ? 'MongoDB' : 'localStorage'} mode`);
+  },
+
+  // Disable MongoDB mode for current session after repeated failures
+  disableMongoFallback(reason, error) {
+    if (this.mongoDisabled) return;
+    this.mongoDisabled = true;
+    this.useMongoDB = false;
+    console.warn(`MongoDB disabled for this session: ${reason}`, error);
   },
 
   // Initialize user system
@@ -215,6 +225,7 @@ const StorageService = {
 
         return this.progressCache;
       } catch (error) {
+        this.disableMongoFallback('Progress fetch failed', error);
         // If user not found in MongoDB, return defaults (new user)
         if (error.message && error.message.includes('User not found')) {
           console.log('User not found in MongoDB - returning defaults for new user');
@@ -257,6 +268,7 @@ const StorageService = {
         return true;
       } catch (error) {
         console.warn('MongoDB API failed, falling back to localStorage:', error);
+        this.disableMongoFallback('Saving progress failed', error);
         return this._saveLocal(data);
       }
     }
@@ -288,6 +300,7 @@ const StorageService = {
           return true;
         } catch (error) {
           console.warn('MongoDB API failed:', error);
+          this.disableMongoFallback('Mark learned failed', error);
         }
       }
 
@@ -316,6 +329,7 @@ const StorageService = {
           return true;
         } catch (error) {
           console.warn('MongoDB API failed:', error);
+          this.disableMongoFallback('Unmark learned failed', error);
         }
       }
 
@@ -365,6 +379,7 @@ const StorageService = {
         return;
       } catch (error) {
         console.warn('MongoDB API failed:', error);
+        this.disableMongoFallback('Submit quiz failed', error);
       }
     }
 
@@ -415,6 +430,7 @@ const StorageService = {
         return;
       } catch (error) {
         console.warn('MongoDB API failed:', error);
+        this.disableMongoFallback('Add session failed', error);
       }
     }
 
@@ -472,6 +488,7 @@ const StorageService = {
         return data.stats.currentStreak;
       } catch (error) {
         console.warn('MongoDB API failed:', error);
+        this.disableMongoFallback('Update streak failed', error);
       }
     }
 
@@ -516,6 +533,7 @@ const StorageService = {
         return;
       } catch (error) {
         console.warn('MongoDB API failed:', error);
+        this.disableMongoFallback('Update preference failed', error);
       }
     }
 
@@ -586,6 +604,7 @@ const StorageService = {
         return;
       } catch (error) {
         console.warn('MongoDB API failed, exporting local data:', error);
+        this.disableMongoFallback('Export data failed', error);
       }
     }
 
