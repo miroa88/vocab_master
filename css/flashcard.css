@@ -123,7 +123,7 @@
 /* Mobile-first sizing for iPhone-sized screens */
 @media (max-width: 430px) {
   .flashcard-container {
-    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - env(safe-area-inset-bottom) - 72px);
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - env(safe-area-inset-bottom) - 110px);
     max-width: 100%;
     margin-bottom: var(--space-sm);
   }
