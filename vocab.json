@@ -6244,7 +6244,7 @@
       "category": "general",
       "translationFa": "درستی؛ صداقت؛ یکپارچگی",
       "translationEn": "honesty and unity",
-      "translationHy": "honesty and unity"
+      "translationHy": "ամբողջականություն, ազնվություն"
     },
     {
       "id": 301,
@@ -6265,7 +6265,7 @@
       "category": "general",
       "translationFa": "باهوش؛ هوشمند",
       "translationEn": "smart and able to learn quickly",
-      "translationHy": "smart and able to learn quickly"
+      "translationHy": "խելացի, արագ ըմբռնող"
     },
     {
       "id": 302,
@@ -6286,7 +6286,7 @@
       "category": "general",
       "translationFa": "شدید؛ قوی",
       "translationEn": "very strong or extreme",
-      "translationHy": "very strong or extreme"
+      "translationHy": "ուժեղ, ինտենսիվ, սուր"
     },
     {
       "id": 303,
@@ -6307,7 +6307,7 @@
       "category": "academic",
       "translationFa": "تعامل داشتن؛ برهم‌کنش",
       "translationEn": "to act together and affect each other",
-      "translationHy": "to act together and affect each other"
+      "translationHy": "փոխազդել, փոխգործակցել"
     },
     {
       "id": 304,
@@ -6327,7 +6327,7 @@
       "category": "education",
       "translationFa": "میانی؛ متوسط",
       "translationEn": "between basic and advanced",
-      "translationHy": "between basic and advanced"
+      "translationHy": "միջանկյալ, միջին մակարդակի"
     },
     {
       "id": 305,
@@ -6348,7 +6348,7 @@
       "category": "general",
       "translationFa": "داخلی",
       "translationEn": "inside something",
-      "translationHy": "inside something"
+      "translationHy": "ներքին"
     },
     {
       "id": 306,
@@ -6369,7 +6369,7 @@
       "category": "academic",
       "translationFa": "تفسیر کردن؛ معنی کردن",
       "translationEn": "to explain the meaning of",
-      "translationHy": "to explain the meaning of"
+      "translationHy": "մեկնաբանել, թարգմանել"
     },
     {
       "id": 307,
@@ -6390,7 +6390,7 @@
       "category": "general",
       "translationFa": "وقفه؛ فاصله زمانی",
       "translationEn": "period of time between events",
-      "translationHy": "period of time between events"
+      "translationHy": "ընդմիջում, ժամանակահատված"
     },
     {
       "id": 308,
@@ -6411,7 +6411,7 @@
       "category": "academic",
       "translationFa": "مداخله کردن؛ وارد عمل شدن",
       "translationEn": "to get involved to change a situation",
-      "translationHy": "to get involved to change a situation"
+      "translationHy": "միջամտել, միջնորդել"
     },
     {
       "id": 309,
@@ -6432,7 +6432,7 @@
       "category": "academic",
       "translationFa": "ذاتی؛ درونی",
       "translationEn": "belonging naturally to something",
-      "translationHy": "belonging naturally to something"
+      "translationHy": "բնորոշ, ներքին"
     },
     {
       "id": 310,
@@ -6453,7 +6453,7 @@
       "category": "economic",
       "translationFa": "سرمایه‌گذاری کردن",
       "translationEn": "to put money or time in to get more later",
-      "translationHy": "to put money or time in to get more later"
+      "translationHy": "ներդնել, ներդրում անել"
     },
     {
       "id": 311,
@@ -6474,7 +6474,7 @@
       "category": "academic",
       "translationFa": "بررسی کردن؛ تحقیق کردن",
       "translationEn": "to examine carefully to find facts",
-      "translationHy": "to examine carefully to find facts"
+      "translationHy": "հետաքննել, ուսումնասիրել"
     },
     {
       "id": 312,
@@ -6494,7 +6494,7 @@
       "category": "academic",
       "translationFa": "فراخواندن؛ استناد کردن",
       "translationEn": "to call on; to mention as support",
-      "translationHy": "to call on; to mention as support"
+      "translationHy": "վկայակոչել, կանչել"
     },
     {
       "id": 313,
@@ -6515,7 +6515,7 @@
       "category": "general",
       "translationFa": "درگیر کردن؛ شامل شدن",
       "translationEn": "to include or make part of",
-      "translationHy": "to include or make part of"
+      "translationHy": "ներառել, ներգրավել"
     },
     {
       "id": 314,
@@ -6536,7 +6536,7 @@
       "category": "academic",
       "translationFa": "جدا کردن؛ منزوی کردن",
       "translationEn": "to keep something or someone apart",
-      "translationHy": "to keep something or someone apart"
+      "translationHy": "մեկուսացնել, առանձնացնել"
     },
     {
       "id": 315,
@@ -6557,7 +6557,7 @@
       "category": "general",
       "translationFa": "مسئله؛ شماره (مجله)",
       "translationEn": "important topic; copy of a magazine",
-      "translationHy": "important topic; copy of a magazine"
+      "translationHy": "հարց, թողարկում"
     },
     {
       "id": 316,
@@ -6578,7 +6578,7 @@
       "category": "general",
       "translationFa": "مورد؛ قلم",
       "translationEn": "single thing in a list",
-      "translationHy": "single thing in a list"
+      "translationHy": "կետ, տարր, նյութ"
     },
     {
       "id": 317,
@@ -6599,7 +6599,7 @@
       "category": "general",
       "translationFa": "شغل؛ کار",
       "translationEn": "regular paid work",
-      "translationHy": "regular paid work"
+      "translationHy": "աշխատանք, պաշտոն"
     },
     {
       "id": 318,
@@ -6620,7 +6620,7 @@
       "category": "academic",
       "translationFa": "مجله علمی یا تخصصی",
       "translationEn": "serious magazine for a subject",
-      "translationHy": "serious magazine for a subject"
+      "translationHy": "գիտական հանդես, ամսագիր"
     },
     {
       "id": 319,
@@ -6641,7 +6641,7 @@
       "category": "academic",
       "translationFa": "توجیه کردن؛ دلیل آوردن",
       "translationEn": "to show something is right or reasonable",
-      "translationHy": "to show something is right or reasonable"
+      "translationHy": "արդարացնել, հիմնավորել"
     },
     {
       "id": 320,
@@ -6662,7 +6662,7 @@
       "category": "general",
       "translationFa": "برچسب؛ برچسب زدن",
       "translationEn": "piece of paper showing name; to tag",
-      "translationHy": "piece of paper showing name; to tag"
+      "translationHy": "պիտակ, մակնշել"
     },
     {
       "id": 321,
@@ -6683,7 +6683,7 @@
       "category": "economic",
       "translationFa": "کار؛ نیروی کار",
       "translationEn": "work, especially hard physical work",
-      "translationHy": "work, especially hard physical work"
+      "translationHy": "աշխատանք, աշխատուժ"
     },
     {
       "id": 322,
@@ -6704,7 +6704,7 @@
       "category": "general",
       "translationFa": "لایه",
       "translationEn": "one thickness or level",
-      "translationHy": "one thickness or level"
+      "translationHy": "շերտ, մակարդակ"
     },
     {
       "id": 323,
@@ -6725,7 +6725,7 @@
       "category": "education",
       "translationFa": "سخنرانی؛ کلاس نظری",
       "translationEn": "talk given to students",
-      "translationHy": "talk given to students"
+      "translationHy": "դասախոսություն"
     },
     {
       "id": 324,
@@ -6745,7 +6745,7 @@
       "category": "legal",
       "translationFa": "حقوقی؛ قانونی",
       "translationEn": "relating to the law",
-      "translationHy": "relating to the law"
+      "translationHy": "իրավական, օրինական"
     },
     {
       "id": 325,
@@ -6765,7 +6765,7 @@
       "category": "legal",
       "translationFa": "قانون‌گذاری کردن",
       "translationEn": "to make or pass laws",
-      "translationHy": "to make or pass laws"
+      "translationHy": "օրենսդրել, օրենքներ ընդունել"
     },
     {
       "id": 326,
@@ -6786,7 +6786,7 @@
       "category": "economic",
       "translationFa": "مالیات اضافی؛ عوارض",
       "translationEn": "extra tax or charge",
-      "translationHy": "extra tax or charge"
+      "translationHy": "գանձում, հարկ"
     },
     {
       "id": 327,
@@ -6806,7 +6806,7 @@
       "category": "politics",
       "translationFa": "آزاداندیش؛ لیبرال",
       "translationEn": "open to new ideas; not strict",
-      "translationHy": "open to new ideas; not strict"
+      "translationHy": "ազատական, լիբերալ"
     },
     {
       "id": 328,
@@ -6827,7 +6827,7 @@
       "category": "legal",
       "translationFa": "مجوز؛ پروانه",
       "translationEn": "official permission",
-      "translationHy": "official permission"
+      "translationHy": "լիցենզիա, պաշտոնական թույլտվություն"
     },
     {
       "id": 329,
@@ -6847,7 +6847,7 @@
       "category": "general",
       "translationFa": "همچنین؛ به همین ترتیب",
       "translationEn": "in the same way",
-      "translationHy": "in the same way"
+      "translationHy": "նույն կերպ, նույնպես"
     },
     {
       "id": 330,
@@ -6868,7 +6868,7 @@
       "category": "general",
       "translationFa": "پیوند؛ اتصال",
       "translationEn": "connection between things",
-      "translationHy": "connection between things"
+      "translationHy": "կապ, կապել"
     },
     {
       "id": 331,
@@ -6889,7 +6889,7 @@
       "category": "general",
       "translationFa": "مکان‌یابی کردن؛ قرار داشتن",
       "translationEn": "to find or be in a place",
-      "translationHy": "to find or be in a place"
+      "translationHy": "տեղորոշել, տեղակայել"
     },
     {
       "id": 332,
@@ -6909,7 +6909,7 @@
       "category": "academic",
       "translationFa": "منطق؛ استدلال",
       "translationEn": "system of clear reasoning",
-      "translationHy": "system of clear reasoning"
+      "translationHy": "տրամաբանություն"
     },
     {
       "id": 333,
@@ -6930,7 +6930,7 @@
       "category": "academic",
       "translationFa": "نگهداری کردن؛ حفظ کردن",
       "translationEn": "to keep in good condition",
-      "translationHy": "to keep in good condition"
+      "translationHy": "պահպանել, սպասարկել"
     },
     {
       "id": 334,
@@ -6951,7 +6951,7 @@
       "category": "general",
       "translationFa": "اصلی؛ مهم؛ عمده",
       "translationEn": "very important or large",
-      "translationHy": "very important or large"
+      "translationHy": "հիմնական, կարևոր, խոշոր"
     },
     {
       "id": 335,
@@ -6972,7 +6972,7 @@
       "category": "academic",
       "translationFa": "دستکاری کردن؛ کنترل کردن",
       "translationEn": "to control or influence cleverly",
-      "translationHy": "to control or influence cleverly"
+      "translationHy": "մանիպուլացնել, ճարպիկ կառավարել"
     },
     {
       "id": 336,
@@ -6993,7 +6993,7 @@
       "category": "general",
       "translationFa": "دستی؛ راهنما",
       "translationEn": "done by hand; instruction book",
-      "translationHy": "done by hand; instruction book"
+      "translationHy": "ձեռքով կատարվող, ձեռնարկ"
     },
     {
       "id": 337,
@@ -7014,7 +7014,7 @@
       "category": "economic",
       "translationFa": "حاشیه؛ حاشیه سود",
       "translationEn": "edge or profit difference",
-      "translationHy": "edge or profit difference"
+      "translationHy": "եզր, մարժա"
     },
     {
       "id": 338,
@@ -7034,7 +7034,7 @@
       "category": "general",
       "translationFa": "بالغ؛ پخته",
       "translationEn": "fully grown or developed",
-      "translationHy": "fully grown or developed"
+      "translationHy": "հասուն"
     },
     {
       "id": 339,
@@ -7055,7 +7055,7 @@
       "category": "academic",
       "translationFa": "حداکثر کردن",
       "translationEn": "to increase as much as possible",
-      "translationHy": "to increase as much as possible"
+      "translationHy": "առավելագույնի հասցնել"
     },
     {
       "id": 340,
@@ -7076,7 +7076,7 @@
       "category": "academic",
       "translationFa": "سازوکار؛ مکانیزم",
       "translationEn": "system of parts that work together",
-      "translationHy": "system of parts that work together"
+      "translationHy": "մեխանիզմ"
     },
     {
       "id": 341,
@@ -7096,7 +7096,7 @@
       "category": "general",
       "translationFa": "رسانه‌ها",
       "translationEn": "news and communication channels",
-      "translationHy": "news and communication channels"
+      "translationHy": "մեդիա, ԶԼՄ-ներ"
     },
     {
       "id": 342,
@@ -7116,7 +7116,7 @@
       "category": "general",
       "translationFa": "میانجی‌گری کردن",
       "translationEn": "to help two sides reach agreement",
-      "translationHy": "to help two sides reach agreement"
+      "translationHy": "միջնորդել, հաշտեցնել"
     },
     {
       "id": 343,
@@ -7136,7 +7136,7 @@
       "category": "health",
       "translationFa": "پزشکی؛ طبی",
       "translationEn": "relating to medicine",
-      "translationHy": "relating to medicine"
+      "translationHy": "բժշկական"
     },
     {
       "id": 344,
@@ -7157,7 +7157,7 @@
       "category": "general",
       "translationFa": "متوسط؛ حد میانه",
       "translationEn": "middle level or size",
-      "translationHy": "middle level or size"
+      "translationHy": "միջին, միջավայր"
     },
     {
       "id": 345,
@@ -7177,7 +7177,7 @@
       "category": "health",
       "translationFa": "ذهنی؛ مربوط به ذهن",
       "translationEn": "related to the mind",
-      "translationHy": "related to the mind"
+      "translationHy": "մտավոր, հոգեկան"
     },
     {
       "id": 346,
@@ -7198,7 +7198,7 @@
       "category": "academic",
       "translationFa": "روش؛ شیوه",
       "translationEn": "planned or regular way of doing",
-      "translationHy": "planned or regular way of doing"
+      "translationHy": "մեթոդ, եղանակ"
     },
     {
       "id": 347,
@@ -7219,7 +7219,7 @@
       "category": "general",
       "translationFa": "مهاجرت کردن",
       "translationEn": "to move from one place to another",
-      "translationHy": "to move from one place to another"
+      "translationHy": "գաղթել, տեղափոխվել"
     },
     {
       "id": 348,
@@ -7239,7 +7239,7 @@
       "category": "politics",
       "translationFa": "نظامی؛ ارتشی",
       "translationEn": "relating to the army or war",
-      "translationHy": "relating to the army or war"
+      "translationHy": "ռազմական, զինվորական"
     },
     {
       "id": 349,
@@ -7259,7 +7259,7 @@
       "category": "general",
       "translationFa": "حداقلی؛ بسیار کم",
       "translationEn": "as small as possible",
-      "translationHy": "as small as possible"
+      "translationHy": "նվազագույն, շատ փոքր"
     },
     {
       "id": 350,
@@ -7280,7 +7280,7 @@
       "category": "academic",
       "translationFa": "به حداقل رساندن",
       "translationEn": "to reduce as much as possible",
-      "translationHy": "to reduce as much as possible"
+      "translationHy": "նվազագույնի հասցնել, նվազեցնել"
     },
     {
       "id": 351,
@@ -7300,7 +7300,7 @@
       "category": "general",
       "translationFa": "حداقل",
       "translationEn": "the smallest amount allowed",
-      "translationHy": "the smallest amount allowed"
+      "translationHy": "նվազագույն"
     },
     {
       "id": 352,
@@ -7320,7 +7320,7 @@
       "category": "politics",
       "translationFa": "وزارتخانه",
       "translationEn": "government department",
-      "translationHy": "government department"
+      "translationHy": "նախարարություն"
     },
     {
       "id": 353,
@@ -7340,7 +7340,7 @@
       "category": "general",
       "translationFa": "جزئی؛ کم‌اهمیت",
       "translationEn": "small; not very important",
-      "translationHy": "small; not very important"
+      "translationHy": "աննշան, երկրորդական"
     },
     {
       "id": 354,
@@ -7361,7 +7361,7 @@
       "category": "academic",
       "translationFa": "حالت؛ شیوه",
       "translationEn": "particular style or form",
-      "translationHy": "particular style or form"
+      "translationHy": "ռեժիմ, ձև, եղանակ"
     },
     {
       "id": 355,
@@ -7382,7 +7382,7 @@
       "category": "academic",
       "translationFa": "تغییر دادن؛ اصلاح کردن",
       "translationEn": "to change slightly",
-      "translationHy": "to change slightly"
+      "translationHy": "փոքր-ինչ փոխել, վերափոխել"
     },
     {
       "id": 356,
@@ -7403,7 +7403,7 @@
       "category": "general",
       "translationFa": "نظارت کردن؛ پایش",
       "translationEn": "to watch and check",
-      "translationHy": "to watch and check"
+      "translationHy": "վերահսկել, հետևել, մոնիտորինգ անել"
     },
     {
       "id": 357,
@@ -7423,7 +7423,7 @@
       "category": "general",
       "translationFa": "انگیزه؛ محرک",
       "translationEn": "reason for doing something",
-      "translationHy": "reason for doing something"
+      "translationHy": "շարժառիթ, մղում"
     },
     {
       "id": 358,
@@ -7443,7 +7443,7 @@
       "category": "general",
       "translationFa": "متقابل؛ دوطرفه",
       "translationEn": "felt or done by each of two sides",
-      "translationHy": "felt or done by each of two sides"
+      "translationHy": "փոխադարձ"
     },
     {
       "id": 359,
@@ -7464,7 +7464,7 @@
       "category": "academic",
       "translationFa": "نفی کردن؛ خنثی کردن",
       "translationEn": "to make something not effective",
-      "translationHy": "to make something not effective"
+      "translationHy": "ժխտել, չեղարկել"
     },
     {
       "id": 360,
@@ -7485,7 +7485,7 @@
       "category": "technology",
       "translationFa": "شبکه",
       "translationEn": "system of connected parts",
-      "translationHy": "system of connected parts"
+      "translationHy": "ցանց"
     },
     {
       "id": 361,
@@ -7505,7 +7505,7 @@
       "category": "general",
       "translationFa": "بی‌طرف؛ خنثی",
       "translationEn": "not supporting either side",
-      "translationHy": "not supporting either side"
+      "translationHy": "չեզոք"
     },
     {
       "id": 362,
@@ -7525,7 +7525,7 @@
       "category": "academic",
       "translationFa": "با این حال؛ با وجود این",
       "translationEn": "in spite of what was said",
-      "translationHy": "in spite of what was said"
+      "translationHy": "այնուամենայնիվ, սակայն"
     },
     {
       "id": 363,
@@ -7545,7 +7545,7 @@
       "category": "academic",
       "translationFa": "با این وجود؛ با این حال",
       "translationEn": "despite that",
-      "translationHy": "despite that"
+      "translationHy": "այնուամենայնիվ, այդուհանդերձ"
     },
     {
       "id": 364,
@@ -7565,7 +7565,7 @@
       "category": "academic",
       "translationFa": "هنجار؛ قاعده معمول",
       "translationEn": "accepted standard or rule",
-      "translationHy": "accepted standard or rule"
+      "translationHy": "նորմ, ընդունված չափանիշ"
     },
     {
       "id": 365,
@@ -7586,7 +7586,7 @@
       "category": "general",
       "translationFa": "عادی؛ معمول",
       "translationEn": "usual or expected",
-      "translationHy": "usual or expected"
+      "translationHy": "նորմալ, սովորական"
     },
     {
       "id": 366,
@@ -7606,7 +7606,7 @@
       "category": "academic",
       "translationFa": "تصور؛ عقیده",
       "translationEn": "idea or belief",
-      "translationHy": "idea or belief"
+      "translationHy": "գաղափար, պատկերացում"
     },
     {
       "id": 367,
@@ -7626,7 +7626,7 @@
       "category": "academic",
       "translationFa": "با وجودِ",
       "translationEn": "in spite of",
-      "translationHy": "in spite of"
+      "translationHy": "չնայած, անկախ"
     },
     {
       "id": 368,
@@ -7646,7 +7646,7 @@
       "category": "science",
       "translationFa": "هسته‌ای؛ اتمی",
       "translationEn": "relating to the nucleus or atomic energy",
-      "translationHy": "relating to the nucleus or atomic energy"
+      "translationHy": "միջուկային"
     },
     {
       "id": 369,
@@ -7667,7 +7667,7 @@
       "category": "academic",
       "translationFa": "هدف؛ عینی",
       "translationEn": "goal; not influenced by feelings",
-      "translationHy": "goal; not influenced by feelings"
+      "translationHy": "նպատակ, օբյեկտիվ"
     },
     {
       "id": 370,
@@ -7688,7 +7688,7 @@
       "category": "academic",
       "translationFa": "به‌دست آوردن؛ گرفتن",
       "translationEn": "to get or gain",
-      "translationHy": "to get or gain"
+      "translationHy": "ստանալ, ձեռք բերել"
     },
     {
       "id": 371,
@@ -7709,7 +7709,7 @@
       "category": "general",
       "translationFa": "واضح؛ بدیهی",
       "translationEn": "easy to notice or understand",
-      "translationHy": "easy to notice or understand"
+      "translationHy": "ակնհայտ, պարզ"
     },
     {
       "id": 372,
@@ -7730,7 +7730,7 @@
       "category": "general",
       "translationFa": "اشغال کردن؛ ساکن بودن",
       "translationEn": "to live in or fill a place",
-      "translationHy": "to live in or fill a place"
+      "translationHy": "զբաղեցնել, բնակվել"
     },
     {
       "id": 373,
@@ -7750,7 +7750,7 @@
       "category": "academic",
       "translationFa": "رخ دادن؛ اتفاق افتادن",
       "translationEn": "to happen",
-      "translationHy": "to happen"
+      "translationHy": "կատարվել, տեղի ունենալ"
     },
     {
       "id": 374,
@@ -7771,7 +7771,7 @@
       "category": "general",
       "translationFa": "عجیب؛ فرد",
       "translationEn": "strange; not even in number",
-      "translationHy": "strange; not even in number"
+      "translationHy": "տարօրինակ, կենտ"
     },
     {
       "id": 375,
@@ -7791,7 +7791,7 @@
       "category": "academic",
       "translationFa": "خنثی کردن؛ جبران کردن",
       "translationEn": "to balance the effect of something",
-      "translationHy": "to balance the effect of something"
+      "translationHy": "հակակշռել, փոխհատուցել"
     },
     {
       "id": 376,
@@ -7811,7 +7811,7 @@
       "category": "general",
       "translationFa": "ادامه‌دار؛ در جریان",
       "translationEn": "continuing to happen",
-      "translationHy": "continuing to happen"
+      "translationHy": "շարունակվող, ընթացիկ"
     },
     {
       "id": 377,
@@ -7831,7 +7831,7 @@
       "category": "general",
       "translationFa": "گزینه؛ انتخاب",
       "translationEn": "choice",
-      "translationHy": "choice"
+      "translationHy": "ընտրանք, տարբերակ"
     },
     {
       "id": 378,
@@ -7852,7 +7852,7 @@
       "category": "academic",
       "translationFa": "جهت دادن؛ آشنا کردن",
       "translationEn": "to direct or adjust to a situation",
-      "translationHy": "to direct or adjust to a situation"
+      "translationHy": "կողմնորոշել, ուղղորդել"
     },
     {
       "id": 379,
@@ -7872,7 +7872,7 @@
       "category": "academic",
       "translationFa": "نتیجه؛ حاصل",
       "translationEn": "result of an action",
-      "translationHy": "result of an action"
+      "translationHy": "արդյունք, ելք"
     },
     {
       "id": 380,
@@ -7892,7 +7892,7 @@
       "category": "academic",
       "translationFa": "خروجی؛ محصول",
       "translationEn": "amount produced",
-      "translationHy": "amount produced"
+      "translationHy": "արտադրանք, ելքային տվյալ"
     },
     {
       "id": 381,
@@ -7912,7 +7912,7 @@
       "category": "general",
       "translationFa": "کلاً؛ در مجموع",
       "translationEn": "in general; including everything",
-      "translationHy": "in general; including everything"
+      "translationHy": "ընդհանուր առմամբ, համընդհանուր"
     },
     {
       "id": 382,
@@ -7932,7 +7932,7 @@
       "category": "academic",
       "translationFa": "همپوشانی داشتن",
       "translationEn": "to cover part of the same area",
-      "translationHy": "to cover part of the same area"
+      "translationHy": "համընկնել, մասամբ ծածկել"
     },
     {
       "id": 383,
@@ -7952,7 +7952,7 @@
       "category": "general",
       "translationFa": "خارج از کشور؛ برون‌مرزی",
       "translationEn": "in or to another country",
-      "translationHy": "in or to another country"
+      "translationHy": "արտերկրում, արտերկիր"
     },
     {
       "id": 384,
@@ -7973,7 +7973,7 @@
       "category": "general",
       "translationFa": "هیئت؛ پنل",
       "translationEn": "small group of experts",
-      "translationHy": "small group of experts"
+      "translationHy": "հանձնախումբ, փորձագետների խումբ"
     },
     {
       "id": 385,
@@ -7994,7 +7994,7 @@
       "category": "academic",
       "translationFa": "پارادایم؛ الگوی فکری",
       "translationEn": "typical example or model",
-      "translationHy": "typical example or model"
+      "translationHy": "պարադիգմ, նախօրինակ"
     },
     {
       "id": 386,
@@ -8014,7 +8014,7 @@
       "category": "education",
       "translationFa": "بندِ نوشته؛ پاراگراف",
       "translationEn": "section of a piece of writing",
-      "translationHy": "section of a piece of writing"
+      "translationHy": "պարբերություն"
     },
     {
       "id": 387,
@@ -8034,7 +8034,7 @@
       "category": "academic",
       "translationFa": "موازی؛ موازی بودن",
       "translationEn": "side by side and never meeting",
-      "translationHy": "side by side and never meeting"
+      "translationHy": "զուգահեռ"
     },
     {
       "id": 388,
@@ -8054,7 +8054,7 @@
       "category": "academic",
       "translationFa": "پارامتر؛ عامل",
       "translationEn": "limit or characteristic that affects a result",
-      "translationHy": "limit or characteristic that affects a result"
+      "translationHy": "պարամետր, սահմանաչափ"
     },
     {
       "id": 389,
@@ -8074,7 +8074,7 @@
       "category": "general",
       "translationFa": "شرکت کردن؛ مشارکت کردن",
       "translationEn": "to take part in",
-      "translationHy": "to take part in"
+      "translationHy": "մասնակցել"
     },
     {
       "id": 390,
@@ -8095,7 +8095,7 @@
       "category": "general",
       "translationFa": "همکار؛ شریک",
       "translationEn": "person you work or do business with",
-      "translationHy": "person you work or do business with"
+      "translationHy": "գործընկեր, զուգընկեր"
     },
     {
       "id": 391,
@@ -8115,7 +8115,7 @@
       "category": "academic",
       "translationFa": "منفعل؛ غیر فعال",
       "translationEn": "not acting; letting things happen",
-      "translationHy": "not acting; letting things happen"
+      "translationHy": "պասիվ, անգործ"
     },
     {
       "id": 392,
@@ -8136,7 +8136,7 @@
       "category": "academic",
       "translationFa": "درک کردن؛ برداشت کردن",
       "translationEn": "to notice or understand",
-      "translationHy": "to notice or understand"
+      "translationHy": "ընկալել, զգալ"
     },
     {
       "id": 393,
@@ -8155,7 +8155,7 @@
       "category": "academic",
       "translationFa": "درصد",
       "translationEn": "number out of every hundred",
-      "translationHy": "number out of every hundred"
+      "translationHy": "տոկոս"
     },
     {
       "id": 394,
@@ -8176,7 +8176,7 @@
       "category": "general",
       "translationFa": "دوره؛ بازه زمانی",
       "translationEn": "length of time",
-      "translationHy": "length of time"
+      "translationHy": "ժամանակաշրջան, պարբերություն"
     },
     {
       "id": 395,
@@ -8197,7 +8197,7 @@
       "category": "academic",
       "translationFa": "پافشاری کردن؛ ادامه دادن",
       "translationEn": "to continue despite difficulty",
-      "translationHy": "to continue despite difficulty"
+      "translationHy": "համառել, շարունակել"
     },
     {
       "id": 396,
@@ -8218,7 +8218,7 @@
       "category": "academic",
       "translationFa": "دیدگاه؛ زاویه دید",
       "translationEn": "way of thinking about something",
-      "translationHy": "way of thinking about something"
+      "translationHy": "տեսանկյուն, դիտանկյուն"
     },
     {
       "id": 397,
@@ -8238,7 +8238,7 @@
       "category": "academic",
       "translationFa": "مرحله",
       "translationEn": "one of the parts of a process",
-      "translationHy": "one of the parts of a process"
+      "translationHy": "փուլ"
     },
     {
       "id": 398,
@@ -8258,7 +8258,7 @@
       "category": "academic",
       "translationFa": "پدیده",
       "translationEn": "event or fact that can be seen",
-      "translationHy": "event or fact that can be seen"
+      "translationHy": "երևույթ"
     },
     {
       "id": 399,
@@ -8279,7 +8279,7 @@
       "category": "general",
       "translationFa": "فلسفه",
       "translationEn": "study of ideas about knowledge and life",
-      "translationHy": "study of ideas about knowledge and life"
+      "translationHy": "փիլիսոփայություն"
     },
     {
       "id": 400,
@@ -8300,7 +8300,7 @@
       "category": "general",
       "translationFa": "فیزیکی؛ جسمی",
       "translationEn": "relating to the body or nature",
-      "translationHy": "relating to the body or nature"
+      "translationHy": "ֆիզիկական, մարմնական"
     },
     {
       "id": 401,
