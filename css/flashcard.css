@@ -7,6 +7,7 @@
   /* Use design-system variables so height adapts by device */
   height: 38.5rem;
   perspective: 1500px;
+  touch-action: pan-y pinch-zoom;
 }
 
 .flashcard {
@@ -16,6 +17,7 @@
   transform-style: preserve-3d;
   transition: transform 0.6s;
   cursor: pointer;
+  touch-action: pan-y pinch-zoom;
 }
 
 .flashcard.flipped {
