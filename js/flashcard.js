@@ -367,13 +367,11 @@ const FlashcardMode = {
     flashcard.classList.toggle('flipped');
     this.isFlipped = !this.isFlipped;
 
-    // Reset scroll position of flashcard back to top when flipping to back
-    if (this.isFlipped) {
-      const flashcardBack = flashcard.querySelector('.flashcard-back');
-      if (flashcardBack) {
-        flashcardBack.scrollTop = 0;
-      }
-    }
+    // Reset scroll position of flashcard content to top on every flip
+    const flashcardBack = flashcard.querySelector('.flashcard-back');
+    const cardContent = flashcard.querySelector('.card-content');
+    if (flashcardBack) flashcardBack.scrollTop = 0;
+    if (cardContent) cardContent.scrollTop = 0;
 
     // Auto-play pronunciation if enabled and flipping to back
     const autoPlay = await StorageService.getPreference('autoPlay');
