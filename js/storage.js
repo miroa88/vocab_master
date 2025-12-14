@@ -195,6 +195,7 @@ const StorageService = {
       translationLanguages: ['Hy'],
       reverseMode: false,
       showFrontTranslation: true,
+      enableSwipe: true,
       certificationKey: null
     },
       stats: {

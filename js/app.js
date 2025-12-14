@@ -331,6 +331,7 @@ const App = {
     const autoPlayToggle = document.getElementById('auto-play');
     const reverseModeToggle = document.getElementById('reverse-mode');
     const frontTranslationToggle = document.getElementById('front-translation-toggle');
+    const swipeToggle = document.getElementById('swipe-toggle');
     const exportBtn = document.getElementById('export-btn');
     const resetBtn = document.getElementById('reset-btn');
     const certificationKeyInput = document.getElementById('certification-key');
@@ -397,6 +398,18 @@ const App = {
         await StorageService.updatePreference('showFrontTranslation', e.target.checked);
         if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
           FlashcardMode.renderCard();
+        }
+      });
+    }
+
+    // Swipe navigation toggle
+    if (swipeToggle) {
+      const savedSwipe = await StorageService.getPreference('enableSwipe');
+      swipeToggle.checked = savedSwipe !== false; // default true
+      swipeToggle.addEventListener('change', async (e) => {
+        await StorageService.updatePreference('enableSwipe', e.target.checked);
+        if (typeof FlashcardMode !== 'undefined') {
+          FlashcardMode.enableSwipe = e.target.checked;
         }
       });
     }

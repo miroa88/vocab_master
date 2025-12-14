@@ -9,12 +9,15 @@ const FlashcardMode = {
     status: 'all',
     difficulty: 'all'
   },
+  enableSwipe: true,
   touchStartX: 0,
   touchEndX: 0,
 
   // Initialize flashcard mode
   async init() {
     await this.loadWords();
+    const swipePref = await StorageService.getPreference('enableSwipe');
+    this.enableSwipe = swipePref !== false;
     this.setupEventListeners();
     await this.renderCard();
     await this.updateProgress();
@@ -138,6 +141,8 @@ const FlashcardMode = {
 
   // Setup touch gestures
   setupTouchGestures(element) {
+    if (!this.enableSwipe) return;
+
     element.addEventListener('touchstart', (e) => {
       this.touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
