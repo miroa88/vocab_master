@@ -13,16 +13,17 @@ const FlashcardMode = {
   touchEndX: 0,
 
   // Initialize flashcard mode
-  init() {
-    this.loadWords();
+  async init() {
+    await this.loadWords();
     this.setupEventListeners();
-    this.renderCard();
-    this.updateProgress();
+    await this.renderCard();
+    await this.updateProgress();
   },
 
   // Load words based on filters
-  loadWords() {
-    this.currentWords = DataService.getFiltered(this.filters);
+  async loadWords() {
+    const words = await DataService.getFiltered(this.filters);
+    this.currentWords = Array.isArray(words) ? words : [];
 
     if (this.currentWords.length === 0) {
       this.currentWords = DataService.getAll();
@@ -113,9 +114,10 @@ const FlashcardMode = {
         statusFilters.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         this.filters.status = e.target.dataset.filter;
-        this.loadWords();
-        this.renderCard();
-        this.updateCardCounter();
+        this.loadWords().then(() => {
+          this.renderCard();
+          this.updateCardCounter();
+        });
       });
     });
 
@@ -126,9 +128,10 @@ const FlashcardMode = {
         difficultyFilters.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         this.filters.difficulty = e.target.dataset.difficulty;
-        this.loadWords();
-        this.renderCard();
-        this.updateCardCounter();
+        this.loadWords().then(() => {
+          this.renderCard();
+          this.updateCardCounter();
+        });
       });
     });
   },
@@ -194,7 +197,7 @@ const FlashcardMode = {
   },
 
   // Render current card
-  renderCard() {
+  async renderCard() {
     if (this.currentWords.length === 0) {
       this.showEmptyState();
       return;
@@ -208,6 +211,7 @@ const FlashcardMode = {
     const wordBack = document.getElementById('word-back');
     const partOfSpeech = document.getElementById('part-of-speech');
     const definitionText = document.getElementById('definition-text');
+    const frontTranslation = document.getElementById('front-translation');
     const translationsContainer = document.getElementById('translations-container');
     const synonymsContainer = document.getElementById('synonyms-container');
     const examplesContainer = document.getElementById('examples-container');
@@ -217,17 +221,32 @@ const FlashcardMode = {
     this.isFlipped = false;
 
     // Check if reverse mode is enabled
-    const reverseMode = StorageService.getPreference('reverseMode') || false;
+    const reverseMode = await StorageService.getPreference('reverseMode') || false;
+    const showFrontTranslation = reverseMode && (await StorageService.getPreference('showFrontTranslation') !== false);
 
     // Set difficulty indicator
     const frontElement = flashcard.querySelector('.flashcard-front');
     frontElement.setAttribute('data-difficulty', word.difficulty);
+
+    // Get user's language preferences
+    const enabledLanguages = await StorageService.getPreference('translationLanguages') || ['Hy'];
+    const translations = this.getTranslationsForWord(word, enabledLanguages);
 
     if (reverseMode) {
       // Reverse mode: show definition on front, word on back
       wordFront.textContent = word.definition;
       wordBack.textContent = word.word;
       partOfSpeech.textContent = ''; // Hide part of speech on front in reverse mode
+
+      if (frontTranslation) {
+        if (showFrontTranslation && translations.length > 0) {
+          frontTranslation.innerHTML = translations.map(t => `<span class="translation-lang">${t.lang}</span> ${this.escapeHtml(t.text)}`).join(' • ');
+          frontTranslation.classList.remove('hidden');
+        } else {
+          frontTranslation.textContent = '';
+          frontTranslation.classList.add('hidden');
+        }
+      }
 
       // Update tap hint
       const tapHint = flashcard.querySelector('.tap-hint');
@@ -237,6 +256,10 @@ const FlashcardMode = {
       wordFront.textContent = word.word;
       wordBack.textContent = word.word;
       partOfSpeech.textContent = word.partOfSpeech || 'word';
+      if (frontTranslation) {
+        frontTranslation.textContent = '';
+        frontTranslation.classList.add('hidden');
+      }
 
       // Update tap hint
       const tapHint = flashcard.querySelector('.tap-hint');
@@ -256,34 +279,7 @@ const FlashcardMode = {
 
     // Set translations
     translationsContainer.innerHTML = '';
-    const translations = [];
-
-    // Get user's language preferences
-    const enabledLanguages = StorageService.getPreference('translationLanguages') || ['Hy'];
-
-    // Map of language codes to full names
-    const languageNames = {
-      'Fa': 'Persian',
-      'Hy': 'Armenian',
-      'En': 'English'
-    };
-
-    // Check for Persian translation
-    if (word.translationFa && enabledLanguages.includes('Fa')) {
-      translations.push({ lang: 'Fa', name: languageNames['Fa'], text: word.translationFa });
-    }
-
-    // Check for Armenian translation
-    if (word.translationHy && enabledLanguages.includes('Hy')) {
-      translations.push({ lang: 'Hy', name: languageNames['Hy'], text: word.translationHy });
-    }
-
-    // Check for English translation
-    if (word.translationEn && enabledLanguages.includes('En')) {
-      translations.push({ lang: 'En', name: languageNames['En'], text: word.translationEn });
-    }
-
-    // Render translations
+    // Render translations (back side)
     translations.forEach(translation => {
       const item = document.createElement('div');
       item.className = 'translation-item';
@@ -336,10 +332,10 @@ const FlashcardMode = {
     this.setupInlineSpeakButtons();
 
     // Update learned status
-    this.updateLearnedButton();
+    await this.updateLearnedButton();
 
     // Update learned indicator
-    const isLearned = StorageService.isLearned(word.id);
+    const isLearned = await StorageService.isLearned(word.id);
     if (isLearned) {
       flashcard.classList.add('learned');
     } else {
@@ -351,7 +347,7 @@ const FlashcardMode = {
   },
 
   // Flip card
-  flipCard() {
+  async flipCard() {
     const flashcard = document.getElementById('flashcard');
 
     flashcard.classList.toggle('flipped');
@@ -366,52 +362,54 @@ const FlashcardMode = {
     }
 
     // Auto-play pronunciation if enabled and flipping to back
-    if (this.isFlipped && StorageService.getPreference('autoPlay')) {
+    const autoPlay = await StorageService.getPreference('autoPlay');
+    if (this.isFlipped && autoPlay) {
       setTimeout(() => this.speakWord(), 300);
     }
   },
 
   // Previous card
-  previousCard() {
+  async previousCard() {
     if (this.currentIndex > 0) {
       this.currentIndex--;
-      this.renderCard();
+      await this.renderCard();
     } else {
       Utils.showToast('This is the first card', 'info');
     }
   },
 
   // Next card
-  nextCard() {
+  async nextCard() {
     if (this.currentIndex < this.currentWords.length - 1) {
       this.currentIndex++;
-      this.renderCard();
+      await this.renderCard();
     } else {
       Utils.showToast('This is the last card', 'info');
     }
   },
 
   // Toggle learned status
-  toggleLearned() {
+  async toggleLearned() {
     const word = this.currentWords[this.currentIndex];
     if (!word) return;
 
-    const isLearned = StorageService.isLearned(word.id);
+    const isLearned = await StorageService.isLearned(word.id);
 
     if (isLearned) {
-      StorageService.unmarkLearned(word.id);
+      await StorageService.unmarkLearned(word.id);
       Utils.showToast(`"${word.word}" marked as unlearned`, 'info');
     } else {
-      StorageService.markLearned(word.id);
+      await StorageService.markLearned(word.id);
       Utils.showToast(`"${word.word}" marked as learned!`, 'success');
     }
 
-    this.updateLearnedButton();
-    this.updateProgress();
+    await this.updateLearnedButton();
+    await this.updateProgress();
 
     // Update learned indicator
     const flashcard = document.getElementById('flashcard');
-    if (StorageService.isLearned(word.id)) {
+    const learnedNow = await StorageService.isLearned(word.id);
+    if (learnedNow) {
       flashcard.classList.add('learned');
     } else {
       flashcard.classList.remove('learned');
@@ -419,13 +417,13 @@ const FlashcardMode = {
   },
 
   // Update learned button
-  updateLearnedButton() {
+  async updateLearnedButton() {
     const word = this.currentWords[this.currentIndex];
     if (!word) return;
 
     const btn = document.getElementById('mark-learned-btn');
     const text = document.getElementById('learned-text');
-    const isLearned = StorageService.isLearned(word.id);
+    const isLearned = await StorageService.isLearned(word.id);
 
     if (isLearned) {
       btn.classList.add('learned');
@@ -485,8 +483,8 @@ const FlashcardMode = {
   },
 
   // Update progress indicator in header
-  updateProgress() {
-    const stats = DataService.getStatistics();
+  async updateProgress() {
+    const stats = await DataService.getStatistics();
     const progressText = document.getElementById('progress-text');
     const progressFill = document.getElementById('progress-fill');
 
@@ -507,10 +505,10 @@ const FlashcardMode = {
   },
 
   // Reset to first card
-  reset() {
+  async reset() {
     this.currentIndex = 0;
-    this.loadWords();
-    this.renderCard();
+    await this.loadWords();
+    await this.renderCard();
   },
 
   // Setup inline speak button listeners
@@ -532,5 +530,29 @@ const FlashcardMode = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  },
+
+  getTranslationsForWord(word, enabledLanguages) {
+    const translations = [];
+
+    const languageNames = {
+      'Fa': 'Persian',
+      'Hy': 'Armenian',
+      'En': 'English'
+    };
+
+    if (word.translationFa && enabledLanguages.includes('Fa')) {
+      translations.push({ lang: 'Fa', name: languageNames['Fa'], text: word.translationFa });
+    }
+
+    if (word.translationHy && enabledLanguages.includes('Hy')) {
+      translations.push({ lang: 'Hy', name: languageNames['Hy'], text: word.translationHy });
+    }
+
+    if (word.translationEn && enabledLanguages.includes('En')) {
+      translations.push({ lang: 'En', name: languageNames['En'], text: word.translationEn });
+    }
+
+    return translations;
   }
 };

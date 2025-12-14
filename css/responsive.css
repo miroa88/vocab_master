@@ -208,16 +208,6 @@
     font-size: var(--font-size-base);
   }
 
-  .user-switcher {
-    font-size: var(--font-size-xs);
-    padding: var(--space-xs) var(--space-sm);
-  }
-
-  .user-switcher svg {
-    width: 14px;
-    height: 14px;
-  }
-
   .progress-indicator {
     min-width: 100px;
   }
@@ -300,10 +290,6 @@
 
   .app-title {
     font-size: var(--font-size-3xl);
-  }
-
-  .user-switcher {
-    display: inline-flex;
   }
 
   .bottom-nav {

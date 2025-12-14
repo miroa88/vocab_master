@@ -6,12 +6,12 @@ const AppConfig = {
   // Uncomment ONE of the following options:
 
   // OPTION 1: Production Server (Render)
-  TTS_BASE_URL: 'https://vocab-master-backend.onrender.com',
-  API_BASE_URL: 'https://vocab-master-backend.onrender.com',
+  // TTS_BASE_URL: 'https://vocab-master-backend.onrender.com',
+  // API_BASE_URL: 'https://vocab-master-backend.onrender.com',
 
   // OPTION 2: Local Development Server
-  // TTS_BASE_URL: 'http://localhost:3000',
-  // API_BASE_URL: 'http://localhost:3000',
+  TTS_BASE_URL: 'http://localhost:3000',
+  API_BASE_URL: 'http://localhost:3000',
 
   // Feature Flags
   USE_MONGODB: true,  // Set to false to use localStorage fallback

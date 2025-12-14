@@ -13,7 +13,7 @@ const SpeechService = {
   },
 
   // Initialize speech service
-  init() {
+  async init() {
     if (this.isSupported()) {
       this.loadVoices();
       if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -21,7 +21,7 @@ const SpeechService = {
       }
     }
 
-    const savedRate = StorageService.getPreference('speechRate');
+    const savedRate = await StorageService.getPreference('speechRate');
     if (savedRate) {
       this.settings.rate = savedRate;
     }
@@ -46,7 +46,7 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
-    const certificate = StorageService.getPreference('certificationKey');
+    const certificate = await StorageService.getPreference('certificationKey');
     if (!certificate) {
       Utils.showToast('Add your certificate in Settings to enable cloud TTS. Using browser voice.', 'info');
       return this.speakWithBrowser(text, options);
@@ -170,9 +170,9 @@ const SpeechService = {
     return this.synth.speaking;
   },
 
-  setRate(rate) {
+  async setRate(rate) {
     this.settings.rate = Math.max(0.5, Math.min(1.5, rate));
-    StorageService.updatePreference('speechRate', this.settings.rate);
+    await StorageService.updatePreference('speechRate', this.settings.rate);
   },
 
   getRate() {

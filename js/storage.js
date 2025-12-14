@@ -5,7 +5,9 @@ const StorageService = {
   STORAGE_KEY_PREFIX: 'vocabProgress_',
   USERS_KEY: 'vocabUsers',
   CURRENT_USER_KEY: 'vocabCurrentUser',
+  CURRENT_USERNAME_KEY: 'vocabCurrentUsername',
   currentUserId: null,
+  currentUsername: null,
   progressCache: null,
   useMongoDB: false,
 
@@ -18,8 +20,12 @@ const StorageService = {
   // Initialize user system
   async initUserSystem() {
     const currentUser = localStorage.getItem(this.CURRENT_USER_KEY);
+    const storedUsername = localStorage.getItem(this.CURRENT_USERNAME_KEY);
     if (currentUser) {
       this.currentUserId = currentUser;
+    }
+    if (storedUsername) {
+      this.currentUsername = storedUsername;
     }
     return this.currentUserId;
   },
@@ -93,16 +99,38 @@ const StorageService = {
   },
 
   // Set current user
-  setCurrentUser(userId) {
+  setCurrentUser(userId, username = null) {
+    if (!userId) {
+      this.currentUserId = null;
+      this.currentUsername = null;
+      localStorage.removeItem(this.CURRENT_USER_KEY);
+      localStorage.removeItem(this.CURRENT_USERNAME_KEY);
+      this.progressCache = null;
+      return;
+    }
+
     this.currentUserId = userId;
+    if (username) {
+      this.currentUsername = username;
+      localStorage.setItem(this.CURRENT_USERNAME_KEY, username);
+    }
     localStorage.setItem(this.CURRENT_USER_KEY, userId);
     this.progressCache = null; // Clear cache when switching users
   },
 
   // Get current user
   async getCurrentUser() {
+    if (this.currentUserId && this.currentUsername) {
+      return { id: this.currentUserId, name: this.currentUsername };
+    }
+
     const users = await this.getAllUsers();
-    return users.find(u => u.id === this.currentUserId);
+    const match = users.find(u => u.id === this.currentUserId);
+    if (match) {
+      this.currentUsername = match.name;
+      localStorage.setItem(this.CURRENT_USERNAME_KEY, match.name);
+    }
+    return match;
   },
 
   // Delete user
@@ -130,6 +158,7 @@ const StorageService = {
     if (this.currentUserId === userId) {
       this.currentUserId = null;
       localStorage.removeItem(this.CURRENT_USER_KEY);
+      localStorage.removeItem(this.CURRENT_USERNAME_KEY);
     }
   },
 
@@ -149,14 +178,15 @@ const StorageService = {
       quizScores: {},
       sessions: [],
       preferences: {
-        speechRate: 0.9,
-        theme: 'light',
-        autoPlay: false,
-        showProgress: true,
-        translationLanguages: ['Hy'],
-        reverseMode: false,
-        certificationKey: null
-      },
+      speechRate: 0.9,
+      theme: 'light',
+      autoPlay: false,
+      showProgress: true,
+      translationLanguages: ['Hy'],
+      reverseMode: false,
+      showFrontTranslation: true,
+      certificationKey: null
+    },
       stats: {
         totalTimeSpent: 0,
         currentStreak: 0,

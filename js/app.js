@@ -1,85 +1,26 @@
-// Main Application Controller
+// Main Application Controller with JWT auth flow
 
 const App = {
   currentView: 'flashcard-view',
   sessionStartTime: null,
   sessionTimer: null,
+  hasBootstrapped: false,
 
   // Initialize application
   async init() {
     this.showLoading();
 
     try {
-      // FORCE MongoDB mode - clear localStorage-only users
-      if (window.AppConfig?.USE_MONGODB) {
-        console.log('MongoDB-only mode: Checking for cloud users...');
+      this.setupAuthUI();
+      this.setupAccountSection();
 
-        // Clear localStorage user data to force MongoDB
-        const localUserId = localStorage.getItem('vocabCurrentUser');
-        if (localUserId) {
-          // Check if this user exists in MongoDB
-          try {
-            const cloudUsers = await ApiClient.getAllUsers();
-            const userExistsInCloud = cloudUsers.some(u => u.userId === localUserId);
-
-            if (!userExistsInCloud) {
-              console.log('Local user not found in MongoDB. Clearing localStorage...');
-              localStorage.removeItem('vocabCurrentUser');
-              localStorage.removeItem('vocabUsers');
-              StorageService.currentUserId = null;
-            }
-          } catch (error) {
-            console.warn('Could not verify MongoDB user:', error);
-          }
-        }
-      }
-
-      // Initialize user system
-      this.setupUserManagement();
-
-      // Check if user is selected
-      const currentUserId = await StorageService.initUserSystem();
-      if (!currentUserId) {
+      const authed = await this.ensureAuthenticated();
+      if (!authed) {
         this.hideLoading();
-        this.showUserModal();
         return;
       }
 
-      // Update user display
-      await this.updateUserDisplay();
-
-      // Load vocabulary data
-      const loaded = await DataService.load();
-
-      if (!loaded) {
-        throw new Error('Failed to load vocabulary data');
-      }
-
-      // Initialize modules
-      FlashcardMode.init();
-      QuizMode.init();
-      StatsMode.init();
-
-      // Setup navigation
-      this.setupNavigation();
-
-      // Setup settings
-      await this.setupSettings();
-
-      // Apply saved theme
-      await this.applyTheme();
-
-      // Start session tracking
-      this.startSession();
-
-      // Update initial stats
-      await StatsMode.refresh();
-
-      this.hideLoading();
-
-      const user = await StorageService.getCurrentUser();
-      Utils.showToast(`Welcome back, ${user.name}!`, 'success');
-
+      await this.bootstrap();
     } catch (error) {
       console.error('Error initializing app:', error);
       this.hideLoading();
@@ -87,17 +28,266 @@ const App = {
     }
   },
 
-  // Show loading indicator
-  showLoading() {
-    document.getElementById('loading').classList.remove('hidden');
+  // Boot the learning experience after auth
+  async bootstrap() {
+    if (this.hasBootstrapped) return;
+    this.hasBootstrapped = true;
+
+    try {
+      // Load vocabulary data
+      const loaded = await DataService.load();
+      if (!loaded) {
+        throw new Error('Failed to load vocabulary data');
+      }
+
+      // Initialize modules
+      await FlashcardMode.init();
+      QuizMode.init();
+      await StatsMode.init();
+
+      // Setup navigation and settings
+      this.setupNavigation();
+      await this.setupSettings();
+      await this.applyTheme();
+
+      // Start session tracking
+      this.startSession();
+
+      // Update initial stats and user display
+      await StatsMode.refresh();
+      await this.updateUserDisplay();
+
+      this.hideLoading();
+
+      const user = await StorageService.getCurrentUser();
+      if (user) {
+        Utils.showToast(`Welcome, ${user.name}!`, 'success');
+      }
+    } catch (error) {
+      console.error('Error during bootstrap:', error);
+      this.hideLoading();
+      Utils.showToast('Failed to start app', 'error');
+
+      // If auth failed (expired token), force logout
+      if (error.status === 401) {
+        this.logout(false);
+      }
+    }
   },
 
-  // Hide loading indicator
-  hideLoading() {
-    document.getElementById('loading').classList.add('hidden');
+  // --- Auth UI & Flow ---
+  setupAuthUI() {
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const setupBtn = document.getElementById('setup-password-btn');
+
+    loginTab?.addEventListener('click', () => this.toggleAuthTab('login'));
+    registerTab?.addEventListener('click', () => this.toggleAuthTab('register'));
+    loginBtn?.addEventListener('click', () => this.handleLogin());
+    registerBtn?.addEventListener('click', () => this.handleRegister());
+    setupBtn?.addEventListener('click', () => this.handlePasswordSetup());
   },
 
-  // Setup navigation
+  toggleAuthTab(tab) {
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const setupForm = document.getElementById('password-setup-form');
+    const title = document.getElementById('auth-title');
+    const subtitle = document.getElementById('auth-subtitle');
+
+    this.clearAuthErrors();
+
+    if (tab === 'login') {
+      loginTab?.classList.add('active');
+      registerTab?.classList.remove('active');
+      loginForm.style.display = 'flex';
+      registerForm.style.display = 'none';
+      setupForm.style.display = 'none';
+      title.textContent = 'Welcome to Vocab Master';
+      subtitle.textContent = 'Login or create an account to start learning';
+    } else if (tab === 'register') {
+      registerTab?.classList.add('active');
+      loginTab?.classList.remove('active');
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'flex';
+      setupForm.style.display = 'none';
+      title.textContent = 'Create your account';
+      subtitle.textContent = 'Set a password to save your progress';
+    } else if (tab === 'setup') {
+      loginTab?.classList.remove('active');
+      registerTab?.classList.remove('active');
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'none';
+      setupForm.style.display = 'flex';
+      title.textContent = 'Set a password';
+      subtitle.textContent = 'This account needs a password to continue';
+    }
+  },
+
+  showAuthModal(tab = 'login') {
+    this.toggleAuthTab(tab);
+    const modal = document.getElementById('auth-modal');
+    modal?.classList.add('show');
+  },
+
+  closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    modal?.classList.remove('show');
+    this.clearAuthErrors();
+  },
+
+  clearAuthErrors() {
+    ['login-error', 'register-error', 'setup-error'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+  },
+
+  async ensureAuthenticated() {
+    const token = ApiClient.getToken();
+    const currentUserId = localStorage.getItem(StorageService.CURRENT_USER_KEY);
+    const currentUsername = localStorage.getItem(StorageService.CURRENT_USERNAME_KEY);
+
+    if (token && currentUserId) {
+      StorageService.currentUserId = currentUserId;
+      if (currentUsername) {
+        StorageService.currentUsername = currentUsername;
+      }
+      return true;
+    }
+
+    this.showAuthModal('login');
+    return false;
+  },
+
+  async handleLogin() {
+    const username = document.getElementById('login-username')?.value.trim();
+    const password = document.getElementById('login-password')?.value;
+    const errorEl = document.getElementById('login-error');
+
+    this.clearAuthErrors();
+
+    if (!username || !password) {
+      errorEl.textContent = 'Please enter your username and password';
+      return;
+    }
+
+    try {
+      const result = await ApiClient.loginUser(username, password);
+      this.onAuthSuccess(result.user);
+    } catch (error) {
+      if (error.status === 428) {
+        // Legacy user needs to set a password
+        document.getElementById('setup-username').value = username;
+        this.toggleAuthTab('setup');
+        return;
+      }
+      errorEl.textContent = error.message || 'Login failed';
+    }
+  },
+
+  async handleRegister() {
+    const username = document.getElementById('register-username')?.value.trim();
+    const password = document.getElementById('register-password')?.value;
+    const confirm = document.getElementById('register-password-confirm')?.value;
+    const errorEl = document.getElementById('register-error');
+
+    this.clearAuthErrors();
+
+    if (!username || !password || !confirm) {
+      errorEl.textContent = 'Please fill in all fields';
+      return;
+    }
+
+    if (password !== confirm) {
+      errorEl.textContent = 'Passwords do not match';
+      return;
+    }
+
+    if (password.length < 6) {
+      errorEl.textContent = 'Password must be at least 6 characters';
+      return;
+    }
+
+    try {
+      const result = await ApiClient.registerUser(username, password);
+      this.onAuthSuccess(result.user);
+    } catch (error) {
+      errorEl.textContent = error.message || 'Registration failed';
+    }
+  },
+
+  async handlePasswordSetup() {
+    const username = document.getElementById('setup-username')?.value.trim();
+    const password = document.getElementById('setup-password')?.value;
+    const confirm = document.getElementById('setup-password-confirm')?.value;
+    const errorEl = document.getElementById('setup-error');
+
+    this.clearAuthErrors();
+
+    if (!username || !password || !confirm) {
+      errorEl.textContent = 'Please fill in all fields';
+      return;
+    }
+
+    if (password !== confirm) {
+      errorEl.textContent = 'Passwords do not match';
+      return;
+    }
+
+    if (password.length < 6) {
+      errorEl.textContent = 'Password must be at least 6 characters';
+      return;
+    }
+
+    try {
+      const result = await ApiClient.setupPassword(username, password);
+      this.onAuthSuccess(result.user);
+    } catch (error) {
+      errorEl.textContent = error.message || 'Could not set password';
+    }
+  },
+
+  onAuthSuccess(user) {
+    StorageService.setCurrentUser(user.userId, user.username);
+    this.updateUserDisplay();
+      this.closeAuthModal();
+
+    if (this.hasBootstrapped) {
+      Utils.showToast('Signed in', 'success');
+      return;
+    }
+
+    this.bootstrap();
+  },
+
+  logout(reload = true) {
+    ApiClient.logout();
+    StorageService.setCurrentUser(null);
+    StorageService.clearCache();
+    this.endSession();
+    this.hasBootstrapped = false;
+    this.showAuthModal('login');
+
+    if (reload) {
+      window.location.reload();
+    }
+  },
+
+  // --- Account menu ---
+  setupAccountSection() {
+    const switchAccountBtn = document.getElementById('switch-account-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    switchAccountBtn?.addEventListener('click', () => this.logout());
+    logoutBtn?.addEventListener('click', () => this.logout());
+  },
+
+  // --- Navigation ---
   setupNavigation() {
     const navButtons = document.querySelectorAll('.nav-btn');
 
@@ -113,7 +303,6 @@ const App = {
     });
   },
 
-  // Switch between views
   switchView(viewId) {
     // Hide all views
     const allViews = document.querySelectorAll('.view');
@@ -134,13 +323,14 @@ const App = {
     }
   },
 
-  // Setup settings
+  // --- Settings ---
   async setupSettings() {
     const themeToggle = document.getElementById('theme-toggle');
     const speechRateSlider = document.getElementById('speech-rate');
     const speechRateValue = document.getElementById('speech-rate-value');
     const autoPlayToggle = document.getElementById('auto-play');
     const reverseModeToggle = document.getElementById('reverse-mode');
+    const frontTranslationToggle = document.getElementById('front-translation-toggle');
     const exportBtn = document.getElementById('export-btn');
     const resetBtn = document.getElementById('reset-btn');
     const certificationKeyInput = document.getElementById('certification-key');
@@ -178,7 +368,10 @@ const App = {
     // Reverse mode toggle
     reverseModeToggle.addEventListener('change', async (e) => {
       await StorageService.updatePreference('reverseMode', e.target.checked);
-      // Refresh flashcard display
+      // Enable/disable translation toggle based on reverse mode
+      if (frontTranslationToggle) {
+        frontTranslationToggle.disabled = !e.target.checked;
+      }
       if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
         FlashcardMode.renderCard();
       }
@@ -187,6 +380,22 @@ const App = {
     // Load saved reverse mode preference
     const savedReverseMode = await StorageService.getPreference('reverseMode');
     reverseModeToggle.checked = savedReverseMode;
+    if (frontTranslationToggle) {
+      frontTranslationToggle.disabled = !savedReverseMode;
+    }
+
+    // Front translation toggle
+    if (frontTranslationToggle) {
+      const savedFrontTranslation = await StorageService.getPreference('showFrontTranslation');
+      frontTranslationToggle.checked = savedFrontTranslation !== false; // default true
+
+      frontTranslationToggle.addEventListener('change', async (e) => {
+        await StorageService.updatePreference('showFrontTranslation', e.target.checked);
+        if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
+          FlashcardMode.renderCard();
+        }
+      });
+    }
 
     // Theme toggle
     themeToggle.addEventListener('change', (e) => {
@@ -241,29 +450,26 @@ const App = {
     resetBtn.addEventListener('click', async () => {
       const confirmed = await StorageService.reset();
       if (confirmed) {
-        // Reload page to reset everything
         window.location.reload();
       }
     });
   },
 
-  // Set theme
+  // --- Theme ---
   async setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     await StorageService.updatePreference('theme', theme);
 
-    // Update toggle
     const themeToggle = document.getElementById('theme-toggle');
     themeToggle.checked = theme === 'dark';
   },
 
-  // Apply saved theme
   async applyTheme() {
     const savedTheme = await StorageService.getPreference('theme') || 'light';
     await this.setTheme(savedTheme);
   },
 
-  // Start session tracking
+  // --- Sessions ---
   startSession() {
     this.sessionStartTime = Date.now();
 
@@ -272,12 +478,10 @@ const App = {
       this.updateSession();
     }, 30000);
 
-    // Save session on page unload
     window.addEventListener('beforeunload', () => {
       this.endSession();
     });
 
-    // Handle visibility change (when tab becomes inactive)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.updateSession();
@@ -285,33 +489,28 @@ const App = {
     });
   },
 
-  // Update current session
   async updateSession() {
     if (!this.sessionStartTime) return;
 
     const duration = Math.floor((Date.now() - this.sessionStartTime) / 1000);
 
-    // Only save if session is meaningful (at least 10 seconds)
     if (duration >= 10) {
       const stats = await DataService.getStatistics();
 
       await StorageService.addSession({
         duration: duration,
         wordsStudied: stats.total,
-        wordsLearned: 0, // Updated when words are marked
+        wordsLearned: 0,
         quizzesTaken: 0,
         quizScore: 0
       });
 
-      // Update streak
       await StorageService.updateStreak();
 
-      // Reset session start time
       this.sessionStartTime = Date.now();
     }
   },
 
-  // End session
   endSession() {
     if (this.sessionTimer) {
       clearInterval(this.sessionTimer);
@@ -320,150 +519,27 @@ const App = {
     this.updateSession();
   },
 
-  // Setup user management
-  setupUserManagement() {
-    const userSwitcher = document.getElementById('user-switcher');
-    const addUserBtn = document.getElementById('add-user-btn');
-    const newUserInput = document.getElementById('new-user-name');
-
-    // User switcher button
-    userSwitcher.addEventListener('click', () => {
-      this.showUserModal();
-    });
-
-    // Add user button
-    addUserBtn.addEventListener('click', () => {
-      this.createNewUser();
-    });
-
-    // Enter key to create user
-    newUserInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.createNewUser();
-      }
-    });
-  },
-
-  // Show user modal
-  async showUserModal() {
-    const modal = document.getElementById('user-modal');
-    const userList = document.getElementById('user-list');
-
-    // Get all users
-    const users = await StorageService.getAllUsers();
-    const currentUserId = StorageService.currentUserId;
-
-    // Clear and populate user list
-    userList.innerHTML = '';
-
-    if (users.length === 0) {
-      userList.innerHTML = '<p class="empty-state">No users yet. Create one below!</p>';
-    } else {
-      for (const user of users) {
-        // Get user stats
-        const oldUserId = StorageService.currentUserId;
-        StorageService.currentUserId = user.id;
-        const learnedCount = await StorageService.getLearnedCount();
-        StorageService.currentUserId = oldUserId;
-
-        const userItem = document.createElement('div');
-        userItem.className = 'user-item' + (user.id === currentUserId ? ' active' : '');
-        userItem.innerHTML = `
-          <div class="user-info">
-            <div class="user-name">${this.escapeHtml(user.name)}</div>
-            <div class="user-stats">${learnedCount} words learned</div>
-          </div>
-          <button class="user-delete" data-user-id="${user.id}" title="Delete user">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-            </svg>
-          </button>
-        `;
-
-        // Select user
-        userItem.addEventListener('click', (e) => {
-          if (!e.target.closest('.user-delete')) {
-            this.selectUser(user.id);
-          }
-        });
-
-        // Delete user
-        const deleteBtn = userItem.querySelector('.user-delete');
-        deleteBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.deleteUser(user.id);
-        });
-
-        userList.appendChild(userItem);
-      }
-    }
-
-    modal.classList.add('show');
-  },
-
-  // Hide user modal
-  hideUserModal() {
-    const modal = document.getElementById('user-modal');
-    modal.classList.remove('show');
-  },
-
-  // Create new user
-  async createNewUser() {
-    const input = document.getElementById('new-user-name');
-    const name = input.value.trim();
-
-    if (!name) {
-      Utils.showToast('Please enter a name', 'error');
-      return;
-    }
-
-    const userId = await StorageService.addUser(name);
-    this.selectUser(userId);
-    input.value = '';
-  },
-
-  // Select user
-  selectUser(userId) {
-    StorageService.setCurrentUser(userId);
-    this.hideUserModal();
-
-    // Reload the app with new user
-    window.location.reload();
-  },
-
-  // Delete user
-  async deleteUser(userId) {
-    const users = await StorageService.getAllUsers();
-    const user = users.find(u => u.id === userId);
-
-    if (!user) return;
-
-    if (confirm(`Are you sure you want to delete ${user.name}'s profile? This cannot be undone.`)) {
-      await StorageService.deleteUser(userId);
-
-      // If we deleted the current user, show modal to select another
-      if (StorageService.currentUserId === null) {
-        await this.showUserModal();
-      } else {
-        // Just refresh the modal
-        await this.showUserModal();
-      }
-    }
-  },
-
-  // Update user display
+  // --- User display ---
   async updateUserDisplay() {
     const user = await StorageService.getCurrentUser();
+    const settingsName = document.getElementById('settings-user-name');
+
     if (user) {
-      document.getElementById('current-user-name').textContent = user.name;
+      if (settingsName) {
+        settingsName.textContent = user.name;
+      }
+    } else if (settingsName) {
+      settingsName.textContent = 'Not signed in';
     }
   },
 
-  // Escape HTML to prevent XSS
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  // --- Loading helpers ---
+  showLoading() {
+    document.getElementById('loading').classList.remove('hidden');
+  },
+
+  hideLoading() {
+    document.getElementById('loading').classList.add('hidden');
   }
 };
 

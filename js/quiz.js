@@ -47,7 +47,7 @@ const QuizMode = {
   },
 
   // Start quiz
-  startQuiz(mode) {
+  async startQuiz(mode) {
     this.currentMode = mode;
     this.currentQuestionIndex = 0;
     this.score = 0;
@@ -55,10 +55,10 @@ const QuizMode = {
     this.sessionStartTime = Date.now();
 
     // Prefer all learned words for a comprehensive review; fall back to random pool
-    const learnedWords = DataService.getLearnedWords();
+    const learnedWords = await DataService.getLearnedWords();
     this.quizWords = learnedWords.length > 0
       ? Utils.shuffle(learnedWords)
-      : DataService.getQuizWords(10);
+      : await DataService.getQuizWords(10);
 
     if (this.quizWords.length === 0) {
       Utils.showToast('No words available for quiz', 'error');
@@ -128,7 +128,7 @@ const QuizMode = {
   },
 
   // Handle answer selection in multiple choice
-  selectAnswer(isCorrect, selectedButton) {
+  async selectAnswer(isCorrect, selectedButton) {
     const word = this.quizWords[this.currentQuestionIndex];
 
     // Disable all options
@@ -158,7 +158,7 @@ const QuizMode = {
     });
 
     // Update quiz score in storage
-    StorageService.updateQuizScore(word.id, isCorrect);
+    await StorageService.updateQuizScore(word.id, isCorrect);
 
     // Show next button
     document.getElementById('quiz-next-btn').classList.remove('hidden');
@@ -204,7 +204,7 @@ const QuizMode = {
   },
 
   // Rate confidence in self-assessment
-  rateConfidence(rating) {
+  async rateConfidence(rating) {
     const word = this.quizWords[this.currentQuestionIndex];
     const ratingNum = parseInt(rating);
 
@@ -224,7 +224,7 @@ const QuizMode = {
     });
 
     // Update quiz score
-    StorageService.updateQuizScore(word.id, isCorrect);
+    await StorageService.updateQuizScore(word.id, isCorrect);
 
     // Show feedback
     const messages = {
@@ -264,7 +264,7 @@ const QuizMode = {
   },
 
   // Show results
-  showResults() {
+  async showResults() {
     const duration = Math.floor((Date.now() - this.sessionStartTime) / 1000);
     const percentage = Utils.calculatePercentage(this.score, this.quizWords.length);
 
@@ -283,7 +283,7 @@ const QuizMode = {
 
     // Save session
     const wrongAnswers = this.answers.filter(a => !a.correct);
-    StorageService.addSession({
+    await StorageService.addSession({
       duration: duration,
       wordsStudied: this.quizWords.length,
       wordsLearned: 0,
@@ -292,7 +292,7 @@ const QuizMode = {
     });
 
     // Update streak
-    StorageService.updateStreak();
+    await StorageService.updateStreak();
 
     // Show/hide review button based on mistakes
     const reviewBtn = document.getElementById('review-mistakes-btn');

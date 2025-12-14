@@ -73,7 +73,10 @@ const ApiClient = {
       if (options.responseType === 'blob') {
         if (!response.ok) {
           const text = await response.text();
-          throw new Error(`API Error (${response.status}): ${text}`);
+          const error = new Error(`API Error (${response.status}): ${text}`);
+          error.status = response.status;
+          error.details = text;
+          throw error;
         }
         return await response.blob();
       }
@@ -82,7 +85,10 @@ const ApiClient = {
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.message || responseData.error || `API Error (${response.status})`);
+        const error = new Error(responseData.message || responseData.error || `API Error (${response.status})`);
+        error.status = response.status;
+        error.details = responseData;
+        throw error;
       }
 
       return responseData;
