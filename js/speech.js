@@ -1,4 +1,4 @@
-// Text-to-Speech Service using Web Speech API and Gemini API
+// Text-to-Speech Service using secure certification keys + backend TTS
 
 const SpeechService = {
   synth: window.speechSynthesis,
@@ -46,67 +46,49 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
-    const geminiApiKey = StorageService.getPreference('geminiApiKey');
+    const certKey = StorageService.getPreference('certificationKey');
+    if (!certKey) {
+      Utils.showToast('Add your certification key in Settings to enable cloud TTS. Using browser voice.', 'info');
+      return this.speakWithBrowser(text, options);
+    }
 
-    if (geminiApiKey) {
-      try {
-        await this.speakWithGemini(text, geminiApiKey, options);
-        return true;
-      } catch (error) {
-        console.error('Gemini TTS failed, falling back to browser speech', error);
-        Utils.showToast('Gemini TTS failed, using browser voice', 'error');
-        return this.speakWithBrowser(text, options);
-      }
-    } else {
+    try {
+      await this.speakWithBackend(text, certKey, options);
+      return true;
+    } catch (error) {
+      console.error('Backend TTS failed, falling back to browser speech', error);
+      Utils.showToast('Cloud TTS failed, using browser voice', 'error');
       return this.speakWithBrowser(text, options);
     }
   },
 
-  // Speak with Gemini API
-  async speakWithGemini(text, apiKey, options) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+  // Speak with secured backend TTS
+  async speakWithBackend(text, certKey, options = {}) {
+    const baseUrl = window.TTS_BASE_URL || 'http://localhost:3000';
+    const url = `${baseUrl.replace(/\/$/, '')}/synthesize`;
+    const deviceInfo = (window.DeviceFingerprint && window.DeviceFingerprint.getDeviceInfo()) || {};
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Cert-Key': certKey
       },
       body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [{
-            text: `Speak the following: ${text}`
-          }]
-        }],
-        generationConfig: {
-          response_modalities: ["AUDIO"],
-          speech_config: {
-            voice_config: {
-              prebuilt_voice_config: {
-                voice_name: "puck"
-              }
-            }
-          }
-        }
-      })
+        text,
+        deviceInfo
+      }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Gemini API request failed: ${errorData.error?.message || response.statusText}`);
+      const errorMessage = errorData.message || response.statusText;
+      throw new Error(errorMessage);
     }
 
-    const data = await response.json();
-
-    // Extract audio content from response
-    const audioContent = data.candidates?.[0]?.content?.parts?.[0]?.inline_data?.data;
-
-    if (!audioContent) {
-      throw new Error('No audio content in response');
-    }
-
-    // Decode base64 audio and play it
-    const audioBuffer = await this.audioContext.decodeAudioData(this.base64ToArrayBuffer(audioContent));
+    // Read raw audio and play
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
 
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
@@ -117,16 +99,6 @@ const SpeechService = {
       if (options.onEnd) options.onEnd();
     };
     source.start(0);
-  },
-
-  base64ToArrayBuffer(base64) {
-    const binaryString = window.atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer;
   },
 
   // Speak with browser's Web Speech API
@@ -218,19 +190,6 @@ const SpeechService = {
   },
 
   getVoices() {
-    return this.voices.filter(voice => voice.lang.startsWith('en'));
-  },
-
-  setVoice(voiceName) {
-    const voice = this.voices.find(v => v.name === voiceName);
-    if (voice) {
-      this.settings.voice = voice;
-      return true;
-    }
-    return false;
-  },
-
-  getCurrentVoice() {
-    return this.settings.voice;
+    return this.voices;
   }
 };

@@ -119,8 +119,8 @@ const App = {
     const reverseModeToggle = document.getElementById('reverse-mode');
     const exportBtn = document.getElementById('export-btn');
     const resetBtn = document.getElementById('reset-btn');
-    const geminiApiKeyInput = document.getElementById('gemini-api-key');
-    const saveApiKeyBtn = document.getElementById('save-api-key');
+    const certificationKeyInput = document.getElementById('certification-key');
+    const saveCertKeyBtn = document.getElementById('save-cert-key');
 
     // Language checkboxes
     const langHy = document.getElementById('lang-hy');
@@ -191,16 +191,20 @@ const App = {
     const savedAutoPlay = StorageService.getPreference('autoPlay');
     autoPlayToggle.checked = savedAutoPlay;
 
-    // Gemini API Key
-    const savedApiKey = StorageService.getPreference('geminiApiKey');
-    if (savedApiKey) {
-      geminiApiKeyInput.value = savedApiKey;
+    // Certification Key
+    const savedCertKey = StorageService.getPreference('certificationKey');
+    if (savedCertKey) {
+      certificationKeyInput.value = savedCertKey;
     }
 
-    saveApiKeyBtn.addEventListener('click', () => {
-      const apiKey = geminiApiKeyInput.value.trim();
-      StorageService.updatePreference('geminiApiKey', apiKey);
-      Utils.showToast('API Key saved!', 'success');
+    saveCertKeyBtn.addEventListener('click', () => {
+      const certKey = certificationKeyInput.value.trim();
+      if (!certKey) {
+        Utils.showToast('Please enter a certification key', 'error');
+        return;
+      }
+      StorageService.updatePreference('certificationKey', certKey);
+      Utils.showToast('Certification Key saved! The app is now authorized.', 'success');
     });
 
     // Export button

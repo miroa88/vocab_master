@@ -6,6 +6,7 @@
     <meta name="description" content="Interactive vocabulary learning app with flashcards, quizzes, and progress tracking">
     <meta name="theme-color" content="#3B82F6">
     <title>Vocab Master - Learn English Vocabulary</title>
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/variables.css">
@@ -429,13 +430,13 @@
                             </label>
                         </div>
                         <div class="setting-item api-key-setting">
-                            <label for="gemini-api-key">
-                                <span>Gemini TTS API Key (Optional)</span>
-                                <p class="setting-description">Enable high-quality neural text-to-speech with Gemini. Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a>.</p>
+                            <label for="certification-key">
+                                <span>App Certification Key (Required)</span>
+                                <p class="setting-description">Enter your certification key to authorize access to the Google Cloud Text-to-Speech backend. Contact the app administrator to obtain your key.</p>
                             </label>
                             <div class="api-key-input-group">
-                                <input type="password" id="gemini-api-key" placeholder="Enter your Gemini TTS API key" class="api-key-input">
-                                <button id="save-api-key" class="btn-secondary">Save</button>
+                                <input type="password" id="certification-key" placeholder="Enter your certification key" class="api-key-input">
+                                <button id="save-cert-key" class="btn-secondary">Save</button>
                             </div>
                         </div>
                     </div>
@@ -501,6 +502,7 @@
     </div>
 
     <!-- JavaScript Modules -->
+    <script src="js/deviceFingerprint.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/speech.js"></script>

@@ -93,7 +93,7 @@ const StorageService = {
         showProgress: true,
         translationLanguages: ['Hy'], // Default: Armenian only
         reverseMode: false, // Default: show word first
-        geminiApiKey: null
+        certificationKey: null
       },
       stats: {
         totalTimeSpent: 0,

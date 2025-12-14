@@ -243,8 +243,16 @@ const FlashcardMode = {
       if (tapHint) tapHint.textContent = 'Tap to flip';
     }
 
-    // Set definition (for back side)
-    definitionText.textContent = word.definition;
+    // Set definition (for back side) with speak button
+    definitionText.innerHTML = `
+      ${word.definition}
+      <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(word.definition)}" title="Speak definition">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+    `;
 
     // Set translations
     translationsContainer.innerHTML = '';
@@ -303,16 +311,29 @@ const FlashcardMode = {
       synonymsContainer.appendChild(badge);
     });
 
-    // Set examples
+    // Set examples with speak buttons
     examplesContainer.innerHTML = '';
     word.examples.forEach(example => {
       const card = document.createElement('div');
       card.className = 'example-card';
+
       const p = document.createElement('p');
-      p.textContent = example;
+      p.innerHTML = `
+        ${example}
+        <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(example)}" title="Speak example">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+      `;
+
       card.appendChild(p);
       examplesContainer.appendChild(card);
     });
+
+    // Setup speak button listeners for definition and examples
+    this.setupInlineSpeakButtons();
 
     // Update learned status
     this.updateLearnedButton();
@@ -490,5 +511,26 @@ const FlashcardMode = {
     this.currentIndex = 0;
     this.loadWords();
     this.renderCard();
+  },
+
+  // Setup inline speak button listeners
+  setupInlineSpeakButtons() {
+    const inlineSpeakBtns = document.querySelectorAll('.inline-speak-btn');
+    inlineSpeakBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card flip
+        const textToSpeak = btn.getAttribute('data-text');
+        if (textToSpeak) {
+          SpeechService.speak(textToSpeak);
+        }
+      });
+    });
+  },
+
+  // Escape HTML to prevent XSS
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 };
