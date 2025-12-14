@@ -10,6 +10,30 @@ const App = {
     this.showLoading();
 
     try {
+      // FORCE MongoDB mode - clear localStorage-only users
+      if (window.AppConfig?.USE_MONGODB) {
+        console.log('MongoDB-only mode: Checking for cloud users...');
+
+        // Clear localStorage user data to force MongoDB
+        const localUserId = localStorage.getItem('vocabCurrentUser');
+        if (localUserId) {
+          // Check if this user exists in MongoDB
+          try {
+            const cloudUsers = await ApiClient.getAllUsers();
+            const userExistsInCloud = cloudUsers.some(u => u.userId === localUserId);
+
+            if (!userExistsInCloud) {
+              console.log('Local user not found in MongoDB. Clearing localStorage...');
+              localStorage.removeItem('vocabCurrentUser');
+              localStorage.removeItem('vocabUsers');
+              StorageService.currentUserId = null;
+            }
+          } catch (error) {
+            console.warn('Could not verify MongoDB user:', error);
+          }
+        }
+      }
+
       // Initialize user system
       this.setupUserManagement();
 

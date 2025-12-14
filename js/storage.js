@@ -36,8 +36,10 @@ const StorageService = {
           createdAt: u.createdAt
         }));
       } catch (error) {
-        console.warn('MongoDB API failed, falling back to localStorage:', error);
-        return this._getAllUsersLocal();
+        console.warn('MongoDB API failed:', error);
+        // In MongoDB-only mode, return empty array on error
+        // Don't fall back to localStorage - force MongoDB users only
+        return [];
       }
     }
     return this._getAllUsersLocal();
@@ -180,6 +182,14 @@ const StorageService = {
 
         return this.progressCache;
       } catch (error) {
+        // If user not found in MongoDB, return defaults (new user)
+        if (error.message && error.message.includes('User not found')) {
+          console.log('User not found in MongoDB - returning defaults for new user');
+          this.progressCache = this.getDefault();
+          return this.progressCache;
+        }
+
+        // For other errors (network issues), fall back to localStorage
         console.warn('MongoDB API failed, falling back to localStorage:', error);
         return this._getLocal();
       }
