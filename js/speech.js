@@ -46,11 +46,12 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
-    const certKey = StorageService.getPreference('certificationKey');
-    if (!certKey) {
-      Utils.showToast('Add your certification key in Settings to enable cloud TTS. Using browser voice.', 'info');
-      return this.speakWithBrowser(text, options);
-    }
+    // CERTIFICATION TEMPORARILY DISABLED FOR TESTING
+    const certKey = StorageService.getPreference('certificationKey') || 'TESTING_NO_CERT';
+    // if (!certKey) {
+    //   Utils.showToast('Add your certification key in Settings to enable cloud TTS. Using browser voice.', 'info');
+    //   return this.speakWithBrowser(text, options);
+    // }
 
     try {
       await this.speakWithBackend(text, certKey, options);
@@ -72,7 +73,7 @@ const SpeechService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Cert-Key': certKey
+        // 'X-Cert-Key': certKey  // TEMPORARILY DISABLED FOR TESTING
       },
       body: JSON.stringify({
         text,
