@@ -2,7 +2,7 @@
 
 const SpeechService = {
   synth: window.speechSynthesis,
-  audioContext: new (window.AudioContext || window.webkitAudioContext)(),
+  audioContext: null, // Lazy initialization for Safari/iOS
   voices: [],
   currentUtterance: null,
   settings: {
@@ -26,7 +26,33 @@ const SpeechService = {
       this.settings.rate = savedRate;
     }
 
+    // Setup AudioContext unlock on first user gesture (Safari/iOS fix)
+    this.setupAudioContextUnlock();
+
     return true;
+  },
+
+  // Setup AudioContext unlock on first user gesture (Safari/iOS compatibility)
+  setupAudioContextUnlock() {
+    const unlockAudio = async () => {
+      try {
+        // Lazy create AudioContext
+        if (!this.audioContext) {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // Resume if suspended
+        if (this.audioContext.state === 'suspended') {
+          await this.audioContext.resume();
+          console.log('AudioContext unlocked on user gesture');
+        }
+      } catch (error) {
+        console.warn('Failed to unlock AudioContext:', error);
+      }
+    };
+
+    // Listen for both touch and click events (mobile and desktop)
+    document.addEventListener('touchend', unlockAudio, { once: true, passive: true });
+    document.addEventListener('click', unlockAudio, { once: true });
   },
 
   // Check if browser supports speech synthesis
@@ -97,6 +123,21 @@ const SpeechService = {
       const errorData = await response.json().catch(() => ({}));
       const errorMessage = errorData.message || response.statusText;
       throw new Error(errorMessage);
+    }
+
+    // Ensure AudioContext is created and unlocked (Safari/iOS fix)
+    if (!this.audioContext) {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    // Resume AudioContext if suspended (Safari/iOS requires user gesture)
+    if (this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+        console.log('AudioContext resumed before playback');
+      } catch (error) {
+        console.warn('Failed to resume AudioContext:', error);
+      }
     }
 
     // Read raw audio and play

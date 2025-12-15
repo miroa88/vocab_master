@@ -41,6 +41,7 @@ const App = {
       }
 
       // Initialize modules
+      await SpeechService.init();
       await FlashcardMode.init();
       QuizMode.init();
       await StatsMode.init();
