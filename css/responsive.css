@@ -254,6 +254,36 @@
   .mark-learned-btn {
     width: 100%;
   }
+
+  /* Certification key input - stack vertically */
+  .api-key-input-group {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .api-key-input {
+    width: 100%;
+    font-size: var(--font-size-sm);
+  }
+
+  #save-cert-key {
+    width: 100%;
+    min-height: 44px;
+    font-size: var(--font-size-sm);
+  }
+
+  /* Account actions buttons - make more compact */
+  .account-actions {
+    gap: var(--space-xs);
+    min-width: 100%;
+  }
+
+  .account-actions .btn-secondary,
+  .account-actions .btn-danger {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    min-height: 40px;
+  }
 }
 
 /* Standard Mobile (381px - 640px) */
@@ -280,6 +310,34 @@
     padding: 5px 8px;
     font-size: calc(var(--font-size-xs) - 1px);
     flex: 0 0 auto;
+  }
+
+  /* Certification key input - stack vertically for medium mobile */
+  .api-key-input-group {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .api-key-input {
+    width: 100%;
+  }
+
+  #save-cert-key {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Account actions buttons - make more compact for medium mobile */
+  .account-actions {
+    gap: var(--space-xs);
+    min-width: 100%;
+  }
+
+  .account-actions .btn-secondary,
+  .account-actions .btn-danger {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    min-height: 40px;
   }
 }
 

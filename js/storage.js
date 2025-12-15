@@ -553,16 +553,22 @@ const StorageService = {
     return data.preferences;
   },
 
-  // Activate certification key (MongoDB only)
+  // Activate certification key
   async activateCertificationKey(certificationKey) {
-    if (!this.useMongoDB) {
-      throw new Error('Certification keys require MongoDB mode');
-    }
-
     if (!certificationKey || !certificationKey.trim()) {
       throw new Error('Certification key cannot be empty');
     }
 
+    // In localStorage mode, just save the key without validation
+    if (!this.useMongoDB) {
+      const data = await this.get();
+      data.preferences.certificationKey = certificationKey.trim();
+      data.preferences.certificationActivatedAt = new Date().toISOString();
+      await this.save(data);
+      return { success: true, message: 'Certification key saved locally' };
+    }
+
+    // In MongoDB mode, validate with backend
     try {
       // Call API to validate and activate the key
       const result = await ApiClient.activateCertificationKey(this.currentUserId, certificationKey.trim());
