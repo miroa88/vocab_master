@@ -391,6 +391,8 @@ const FlashcardMode = {
     if (this.currentIndex > 0) {
       this.currentIndex--;
       await this.renderCard();
+      // Ensure scroll is reset after DOM update
+      this.resetScrollPosition();
     } else {
       Utils.showToast('This is the first card', 'info');
     }
@@ -401,6 +403,8 @@ const FlashcardMode = {
     if (this.currentIndex < this.currentWords.length - 1) {
       this.currentIndex++;
       await this.renderCard();
+      // Ensure scroll is reset after DOM update
+      this.resetScrollPosition();
     } else {
       Utils.showToast('This is the last card', 'info');
     }
@@ -548,6 +552,15 @@ const FlashcardMode = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  },
+
+  // Reset scroll position to top
+  resetScrollPosition() {
+    const flashcard = document.getElementById('flashcard');
+    const flashcardBack = flashcard?.querySelector('.flashcard-back');
+    const cardContent = flashcard?.querySelector('.card-content');
+    if (flashcardBack) flashcardBack.scrollTop = 0;
+    if (cardContent) cardContent.scrollTop = 0;
   },
 
   getTranslationsForWord(word, enabledLanguages) {
