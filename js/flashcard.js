@@ -358,6 +358,12 @@ const FlashcardMode = {
 
     // Update counter
     this.updateCardCounter();
+
+    // Ensure back/content scroll is at top for new card
+    const flashcardBack = flashcard.querySelector('.flashcard-back');
+    const cardContent = flashcard.querySelector('.card-content');
+    if (flashcardBack) flashcardBack.scrollTop = 0;
+    if (cardContent) cardContent.scrollTop = 0;
   },
 
   // Flip card
