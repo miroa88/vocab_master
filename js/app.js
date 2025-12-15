@@ -442,19 +442,76 @@ const App = {
     autoPlayToggle.checked = savedAutoPlay;
 
     // Certification Key
-    const savedCertKey = await StorageService.getPreference('certificationKey');
-    if (savedCertKey) {
-      certificationKeyInput.value = savedCertKey;
-    }
+    const loadCertificationStatus = async () => {
+      try {
+        const status = await StorageService.getCertificationStatus();
+        if (status.isActivated && status.certificationKey) {
+          certificationKeyInput.value = '••••••••••••'; // Mask the key for security
+          certificationKeyInput.disabled = true;
+          saveCertKeyBtn.textContent = 'Revoke Key';
+          saveCertKeyBtn.classList.add('revoke-mode');
+
+          // Show activation date if available
+          if (status.activatedAt) {
+            const activatedDate = new Date(status.activatedAt).toLocaleDateString();
+            Utils.showToast(`Certification key activated on ${activatedDate}`, 'info');
+          }
+        } else {
+          certificationKeyInput.value = '';
+          certificationKeyInput.disabled = false;
+          saveCertKeyBtn.textContent = 'Save Certification Key';
+          saveCertKeyBtn.classList.remove('revoke-mode');
+        }
+      } catch (error) {
+        console.error('Failed to load certification status:', error);
+      }
+    };
+
+    // Load certification status on page load
+    await loadCertificationStatus();
 
     saveCertKeyBtn.addEventListener('click', async () => {
+      // Check if we're in revoke mode
+      if (saveCertKeyBtn.classList.contains('revoke-mode')) {
+        if (confirm('Are you sure you want to revoke your certification key? You will need to enter a new key to continue using premium features.')) {
+          try {
+            await StorageService.revokeCertificationKey();
+            Utils.showToast('Certification key revoked successfully', 'success');
+            await loadCertificationStatus();
+          } catch (error) {
+            Utils.showToast(error.message || 'Failed to revoke certification key', 'error');
+          }
+        }
+        return;
+      }
+
+      // Activate new certification key
       const certKey = certificationKeyInput.value.trim();
       if (!certKey) {
         Utils.showToast('Please enter a certification key', 'error');
         return;
       }
-      await StorageService.updatePreference('certificationKey', certKey);
-      Utils.showToast('Certification Key saved! The app is now authorized.', 'success');
+
+      try {
+        // Show loading state
+        saveCertKeyBtn.disabled = true;
+        saveCertKeyBtn.textContent = 'Validating...';
+
+        // Activate the certification key (this will validate it on the server)
+        await StorageService.activateCertificationKey(certKey);
+
+        Utils.showToast('Certification key activated successfully! The app is now authorized.', 'success');
+
+        // Reload certification status to update UI
+        await loadCertificationStatus();
+      } catch (error) {
+        Utils.showToast(error.message || 'Failed to activate certification key', 'error');
+      } finally {
+        saveCertKeyBtn.disabled = false;
+        if (!saveCertKeyBtn.classList.contains('revoke-mode')) {
+          saveCertKeyBtn.textContent = 'Save Certification Key';
+        }
+      }
     });
 
     // Export button

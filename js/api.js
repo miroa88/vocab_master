@@ -265,6 +265,25 @@ const ApiClient = {
   async exportUserData(userId) {
     return this.get(`/api/users/${userId}/export`);
   },
+
+  /**
+   * Certification Key APIs
+   */
+  async validateCertificationKey(certificationKey) {
+    return this.post("/api/certification/validate", { certificationKey }, { requiresAuth: false });
+  },
+
+  async activateCertificationKey(userId, certificationKey) {
+    return this.post(`/api/users/${userId}/certification`, { certificationKey });
+  },
+
+  async getCertificationStatus(userId) {
+    return this.get(`/api/users/${userId}/certification`);
+  },
+
+  async revokeCertificationKey(userId) {
+    return this.delete(`/api/users/${userId}/certification`);
+  },
 };
 
 // Initialize on load

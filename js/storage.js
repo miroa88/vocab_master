@@ -553,6 +553,92 @@ const StorageService = {
     return data.preferences;
   },
 
+  // Activate certification key (MongoDB only)
+  async activateCertificationKey(certificationKey) {
+    if (!this.useMongoDB) {
+      throw new Error('Certification keys require MongoDB mode');
+    }
+
+    if (!certificationKey || !certificationKey.trim()) {
+      throw new Error('Certification key cannot be empty');
+    }
+
+    try {
+      // Call API to validate and activate the key
+      const result = await ApiClient.activateCertificationKey(this.currentUserId, certificationKey.trim());
+
+      // Update local cache with the certification key
+      const data = await this.get();
+      data.preferences.certificationKey = certificationKey.trim();
+      data.preferences.certificationActivatedAt = new Date().toISOString();
+      this.progressCache = data;
+      this._saveLocal(data);
+
+      return result;
+    } catch (error) {
+      if (error.status === 409) {
+        throw new Error('This certification key is already in use by another user');
+      } else if (error.status === 400) {
+        throw new Error('Invalid certification key');
+      } else if (error.status === 404) {
+        throw new Error('Certification key not found');
+      }
+      throw new Error(`Failed to activate certification key: ${error.message}`);
+    }
+  },
+
+  // Get certification status (MongoDB only)
+  async getCertificationStatus() {
+    if (!this.useMongoDB) {
+      // In local mode, just check if key exists in preferences
+      const data = await this.get();
+      return {
+        isActivated: !!data.preferences.certificationKey,
+        certificationKey: data.preferences.certificationKey || null,
+        activatedAt: data.preferences.certificationActivatedAt || null
+      };
+    }
+
+    try {
+      const status = await ApiClient.getCertificationStatus(this.currentUserId);
+      return status;
+    } catch (error) {
+      console.warn('Failed to get certification status:', error);
+      return {
+        isActivated: false,
+        certificationKey: null,
+        activatedAt: null
+      };
+    }
+  },
+
+  // Revoke certification key (MongoDB only)
+  async revokeCertificationKey() {
+    if (!this.useMongoDB) {
+      // In local mode, just remove from preferences
+      const data = await this.get();
+      data.preferences.certificationKey = null;
+      data.preferences.certificationActivatedAt = null;
+      await this.save(data);
+      return true;
+    }
+
+    try {
+      await ApiClient.revokeCertificationKey(this.currentUserId);
+
+      // Update local cache
+      const data = await this.get();
+      data.preferences.certificationKey = null;
+      data.preferences.certificationActivatedAt = null;
+      this.progressCache = data;
+      this._saveLocal(data);
+
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to revoke certification key: ${error.message}`);
+    }
+  },
+
   // Get words learned this week
   async getWordsLearnedThisWeek() {
     const data = await this.get();
