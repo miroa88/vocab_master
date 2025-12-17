@@ -34,16 +34,18 @@ const SpeechService = {
 
   // Setup AudioContext unlock on first user gesture (Safari/iOS compatibility)
   setupAudioContextUnlock() {
-    const unlockAudio = async () => {
+    const unlockAudio = () => {
       try {
-        // Lazy create AudioContext
+        // CRITICAL for iOS: Create AudioContext SYNCHRONOUSLY in user gesture handler
         if (!this.audioContext) {
           this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          console.log('AudioContext created on user gesture, state:', this.audioContext.state);
         }
-        // Resume if suspended
+        // Resume if suspended - call synchronously without await
         if (this.audioContext.state === 'suspended') {
-          await this.audioContext.resume();
-          console.log('AudioContext unlocked on user gesture');
+          this.audioContext.resume()
+            .then(() => console.log('AudioContext resumed on user gesture, state:', this.audioContext.state))
+            .catch(error => console.warn('Failed to resume AudioContext:', error));
         }
       } catch (error) {
         console.warn('Failed to unlock AudioContext:', error);
@@ -51,8 +53,9 @@ const SpeechService = {
     };
 
     // Listen for both touch and click events (mobile and desktop)
-    document.addEventListener('touchend', unlockAudio, { once: true, passive: true });
-    document.addEventListener('click', unlockAudio, { once: true });
+    // Use capture phase to ensure we catch events before any stopPropagation
+    document.addEventListener('touchstart', unlockAudio, { once: false, passive: true, capture: true });
+    document.addEventListener('click', unlockAudio, { once: false, capture: true });
   },
 
   // Check if browser supports speech synthesis
@@ -113,16 +116,24 @@ const SpeechService = {
       "https://vocab-master-backend.onrender.com";
     const url = `${baseUrl.replace(/\/$/, "")}/synthesize`;
 
-    // Ensure AudioContext is created FIRST (before any async operations)
-    // This is critical for iOS - AudioContext must be created synchronously in user gesture
+    // Ensure AudioContext exists - should have been created by setupAudioContextUnlock
     if (!this.audioContext) {
+      console.warn('[SpeechService] AudioContext not initialized, creating now');
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // Start resuming AudioContext immediately (don't await yet to keep gesture context)
-    const resumePromise = this.audioContext.state === 'suspended'
-      ? this.audioContext.resume()
-      : Promise.resolve();
+    console.log('[SpeechService] AudioContext state before fetch:', this.audioContext.state);
+
+    // Resume AudioContext if suspended - critical for iOS Safari
+    // Must be called in the same call stack as the user gesture
+    if (this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+        console.log('[SpeechService] AudioContext resumed, state:', this.audioContext.state);
+      } catch (error) {
+        console.warn('[SpeechService] Failed to resume AudioContext:', error);
+      }
+    }
 
     const response = await fetch(url, {
       method: "POST",
@@ -143,14 +154,19 @@ const SpeechService = {
 
     // Read raw audio and decode
     const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    console.log('[SpeechService] Audio buffer received, size:', arrayBuffer.byteLength);
 
-    // Ensure AudioContext is resumed before playing (await the resume we started earlier)
-    try {
-      await resumePromise;
-      console.log('AudioContext resumed before playback');
-    } catch (error) {
-      console.warn('Failed to resume AudioContext:', error);
+    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    console.log('[SpeechService] Audio decoded, duration:', audioBuffer.duration, 'seconds');
+
+    // Final check - ensure AudioContext is running
+    if (this.audioContext.state === 'suspended') {
+      console.warn('[SpeechService] AudioContext still suspended, attempting resume again');
+      try {
+        await this.audioContext.resume();
+      } catch (error) {
+        console.error('[SpeechService] Failed final resume attempt:', error);
+      }
     }
 
     const source = this.audioContext.createBufferSource();
@@ -159,8 +175,11 @@ const SpeechService = {
 
     if (options.onStart) options.onStart();
     source.onended = () => {
+      console.log('[SpeechService] Audio playback ended');
       if (options.onEnd) options.onEnd();
     };
+
+    console.log('[SpeechService] Starting audio playback, AudioContext state:', this.audioContext.state);
     source.start(0);
   },
 
