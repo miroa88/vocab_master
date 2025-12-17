@@ -135,11 +135,11 @@
   }
 
   .word-text {
-    font-size: clamp(22px, 5vw, 32px);
+    font-size: clamp(26px, 6vw, 38px);
   }
 
   .flashcard.reverse-mode .word-text {
-    font-size: clamp(18px, 4.2vw, 26px);
+    font-size: clamp(20px, 5vw, 30px);
   }
 
   .front-translation {
@@ -150,7 +150,7 @@
   .definition-text,
   .translation-text,
   .example-card p {
-    font-size: 15px;
+    font-size: 18px;
     line-height: 1.5;
   }
 
