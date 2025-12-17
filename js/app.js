@@ -64,6 +64,13 @@ const App = {
       if (user) {
         Utils.showToast(`Welcome, ${user.name}!`, 'success');
       }
+
+      // Warn user if in private browsing mode
+      if (StorageService.isPrivateMode) {
+        setTimeout(() => {
+          Utils.showToast('Private browsing detected. Settings may not persist after closing the browser.', 'info', 5000);
+        }, 2000);
+      }
     } catch (error) {
       console.error('Error during bootstrap:', error);
       this.hideLoading();

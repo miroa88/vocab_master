@@ -11,12 +11,29 @@ const StorageService = {
   progressCache: null,
   useMongoDB: false,
   mongoDisabled: false,
+  isPrivateMode: false,
 
   // Initialize storage service
   init() {
     this.useMongoDB = window.AppConfig?.USE_MONGODB ?? false;
     this.mongoDisabled = false;
-    console.log(`Storage initialized: ${this.useMongoDB ? 'MongoDB' : 'localStorage'} mode`);
+    this.detectPrivateMode();
+    console.log(`Storage initialized: ${this.useMongoDB ? 'MongoDB' : 'localStorage'} mode${this.isPrivateMode ? ' (Private browsing detected)' : ''}`);
+  },
+
+  // Detect private browsing mode (Safari, Firefox, etc.)
+  detectPrivateMode() {
+    try {
+      // Try to use localStorage
+      const test = '__storage_test__';
+      localStorage.setItem(test, test);
+      localStorage.removeItem(test);
+      this.isPrivateMode = false;
+    } catch (e) {
+      // localStorage is not available (private mode or disabled)
+      this.isPrivateMode = true;
+      console.warn('Private browsing mode detected - localStorage is restricted');
+    }
   },
 
   // Disable MongoDB mode for current session after repeated failures
@@ -29,13 +46,23 @@ const StorageService = {
 
   // Initialize user system
   async initUserSystem() {
-    const currentUser = localStorage.getItem(this.CURRENT_USER_KEY);
-    const storedUsername = localStorage.getItem(this.CURRENT_USERNAME_KEY);
-    if (currentUser) {
-      this.currentUserId = currentUser;
+    // In private mode, skip localStorage reads
+    if (this.isPrivateMode) {
+      return this.currentUserId;
     }
-    if (storedUsername) {
-      this.currentUsername = storedUsername;
+
+    try {
+      const currentUser = localStorage.getItem(this.CURRENT_USER_KEY);
+      const storedUsername = localStorage.getItem(this.CURRENT_USERNAME_KEY);
+      if (currentUser) {
+        this.currentUserId = currentUser;
+      }
+      if (storedUsername) {
+        this.currentUsername = storedUsername;
+      }
+    } catch (error) {
+      console.warn('Failed to read user from localStorage:', error);
+      this.isPrivateMode = true;
     }
     return this.currentUserId;
   },
@@ -113,19 +140,38 @@ const StorageService = {
     if (!userId) {
       this.currentUserId = null;
       this.currentUsername = null;
-      localStorage.removeItem(this.CURRENT_USER_KEY);
-      localStorage.removeItem(this.CURRENT_USERNAME_KEY);
       this.progressCache = null;
+
+      // Only update localStorage if not in private mode
+      if (!this.isPrivateMode) {
+        try {
+          localStorage.removeItem(this.CURRENT_USER_KEY);
+          localStorage.removeItem(this.CURRENT_USERNAME_KEY);
+        } catch (error) {
+          console.warn('Failed to clear user from localStorage:', error);
+        }
+      }
       return;
     }
 
     this.currentUserId = userId;
     if (username) {
       this.currentUsername = username;
-      localStorage.setItem(this.CURRENT_USERNAME_KEY, username);
     }
-    localStorage.setItem(this.CURRENT_USER_KEY, userId);
     this.progressCache = null; // Clear cache when switching users
+
+    // Only update localStorage if not in private mode
+    if (!this.isPrivateMode) {
+      try {
+        localStorage.setItem(this.CURRENT_USER_KEY, userId);
+        if (username) {
+          localStorage.setItem(this.CURRENT_USERNAME_KEY, username);
+        }
+      } catch (error) {
+        console.warn('Failed to save user to localStorage:', error);
+        this.isPrivateMode = true;
+      }
+    }
   },
 
   // Get current user
@@ -219,9 +265,18 @@ const StorageService = {
     if (this.useMongoDB) {
       try {
         const progress = await ApiClient.getProgress(this.currentUserId);
-        this.progressCache = { ...this.getDefault(), ...progress };
 
-        // Also save to localStorage as backup
+        // Debug log for certification key tracking
+        if (progress?.preferences?.certificationKey) {
+          console.log('Certification key loaded from MongoDB');
+        } else {
+          console.log('No certification key in MongoDB response');
+        }
+
+        // Deep merge to preserve nested preferences
+        this.progressCache = this._deepMerge(this.getDefault(), progress);
+
+        // Also save to localStorage as backup (skip in private mode)
         this._saveLocal(this.progressCache);
 
         return this.progressCache;
@@ -243,18 +298,40 @@ const StorageService = {
   },
 
   _getLocal() {
+    // In private mode, localStorage won't work - return defaults
+    if (this.isPrivateMode) {
+      console.log('Private mode: localStorage unavailable, returning defaults');
+      return this.getDefault();
+    }
+
     try {
       const data = localStorage.getItem(this.getUserStorageKey());
       if (!data) {
         return this.getDefault();
       }
       const parsed = JSON.parse(data);
-      this.progressCache = { ...this.getDefault(), ...parsed };
+      // Deep merge to preserve nested preferences
+      this.progressCache = this._deepMerge(this.getDefault(), parsed);
       return this.progressCache;
     } catch (error) {
       console.error('Error reading storage:', error);
+      // If reading fails, might be in private mode
+      this.isPrivateMode = true;
       return this.getDefault();
     }
+  },
+
+  // Deep merge helper to properly merge nested objects like preferences
+  _deepMerge(target, source) {
+    const result = { ...target };
+    for (const key in source) {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+        result[key] = this._deepMerge(target[key] || {}, source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    }
+    return result;
   },
 
   // Save all data
@@ -277,11 +354,19 @@ const StorageService = {
   },
 
   _saveLocal(data) {
+    // In private mode, skip localStorage saves (they will fail anyway)
+    if (this.isPrivateMode) {
+      console.log('Private mode: skipping localStorage save, relying on cache');
+      return true; // Return true since cache is already updated
+    }
+
     try {
       localStorage.setItem(this.getUserStorageKey(), JSON.stringify(data));
       return true;
     } catch (error) {
-      console.error('Error saving storage:', error);
+      console.error('Error saving to localStorage:', error);
+      // If this fails, we might be in private mode
+      this.isPrivateMode = true;
       return false;
     }
   },
@@ -526,11 +611,17 @@ const StorageService = {
     const data = await this.get();
     data.preferences[key] = value;
 
+    // Debug log for certification key saves
+    if (key === 'certificationKey') {
+      console.log('Saving certification key:', value ? 'Present' : 'Null');
+    }
+
     if (this.useMongoDB) {
       try {
         await ApiClient.updatePreference(this.currentUserId, key, value);
         this.progressCache = data;
         this._saveLocal(data);
+        console.log(`Preference '${key}' saved to MongoDB successfully`);
         return;
       } catch (error) {
         console.warn('MongoDB API failed:', error);
@@ -544,7 +635,31 @@ const StorageService = {
   // Get preference
   async getPreference(key) {
     const data = await this.get();
-    return data.preferences[key];
+    const value = data.preferences[key];
+
+    // Special handling for certificationKey - check localStorage as fallback
+    // This ensures the key is never lost even if MongoDB sync has issues
+    // Skip in private mode since localStorage is not available
+    if (key === 'certificationKey' && !value && this.useMongoDB && !this.isPrivateMode) {
+      try {
+        const localData = localStorage.getItem(this.getUserStorageKey());
+        if (localData) {
+          const parsed = JSON.parse(localData);
+          const localCertKey = parsed?.preferences?.certificationKey;
+          if (localCertKey) {
+            console.log('Certification key recovered from localStorage backup');
+            // Update cache with recovered key
+            data.preferences.certificationKey = localCertKey;
+            this.progressCache = data;
+            return localCertKey;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to check localStorage for certification key:', error);
+      }
+    }
+
+    return value;
   },
 
   // Get all preferences
