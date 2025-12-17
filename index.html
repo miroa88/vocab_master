@@ -495,6 +495,11 @@
                                 <input type="password" id="certification-key" placeholder="Enter your certification key" class="api-key-input">
                                 <button id="save-cert-key" class="btn-secondary">Save</button>
                             </div>
+                            <div id="cert-key-debug" style="margin-top: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; font-size: 0.875rem; display: none;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 0.875rem;">Debug Information</h4>
+                                <div id="cert-debug-info" style="font-family: monospace; white-space: pre-wrap; color: var(--text-secondary);"></div>
+                            </div>
+                            <button id="check-cert-key" class="btn-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">🔍 Check Key Status</button>
                         </div>
                     </div>
 
@@ -509,8 +514,9 @@
                     </div>
 
                     <div class="app-info">
-                        <p>Vocab Master v1.0</p>
+                        <p>Vocab Master <span id="app-version">v1.0.0</span></p>
                         <p>572 Academic Word List vocabulary</p>
+                        <p id="build-info" style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.5rem;"></p>
                     </div>
                 </div>
             </div>

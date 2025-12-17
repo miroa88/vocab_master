@@ -333,6 +333,16 @@ const App = {
 
   // --- Settings ---
   async setupSettings() {
+    // Display version information
+    const versionEl = document.getElementById('app-version');
+    const buildInfoEl = document.getElementById('build-info');
+    if (versionEl && window.AppConfig) {
+      versionEl.textContent = `v${window.AppConfig.VERSION}`;
+    }
+    if (buildInfoEl && window.AppConfig) {
+      buildInfoEl.textContent = `Build: ${window.AppConfig.BUILD_DATE} | ${StorageService.useMongoDB ? 'MongoDB' : 'localStorage'}${StorageService.isPrivateMode ? ' | Private Mode' : ''}`;
+    }
+
     const themeToggle = document.getElementById('theme-toggle');
     const speechRateSlider = document.getElementById('speech-rate');
     const speechRateValue = document.getElementById('speech-rate-value');
@@ -521,6 +531,112 @@ const App = {
         }
       }
     });
+
+    // Check certification key status button
+    const checkCertKeyBtn = document.getElementById('check-cert-key');
+    const certDebugPanel = document.getElementById('cert-key-debug');
+    const certDebugInfo = document.getElementById('cert-debug-info');
+
+    if (checkCertKeyBtn) {
+      checkCertKeyBtn.addEventListener('click', async () => {
+        checkCertKeyBtn.disabled = true;
+        checkCertKeyBtn.textContent = '⏳ Checking...';
+
+        try {
+          const debugOutput = [];
+
+          debugOutput.push('=== CERTIFICATION KEY DEBUG ===\n');
+          debugOutput.push(`Timestamp: ${new Date().toISOString()}\n`);
+          debugOutput.push(`Version: ${window.AppConfig?.VERSION || 'Unknown'}\n`);
+          debugOutput.push(`Build: ${window.AppConfig?.BUILD_DATE || 'Unknown'}\n\n`);
+
+          // Storage mode
+          debugOutput.push(`Storage Mode: ${StorageService.useMongoDB ? 'MongoDB' : 'localStorage'}\n`);
+          debugOutput.push(`Private Mode: ${StorageService.isPrivateMode ? 'YES ⚠️' : 'NO'}\n`);
+          debugOutput.push(`User ID: ${StorageService.currentUserId || 'Not set'}\n\n`);
+
+          // Clear cache to force fresh load from backend
+          debugOutput.push('Clearing cache...\n');
+          StorageService.progressCache = null;
+
+          // Try to get certification key
+          debugOutput.push('Fetching certification key...\n');
+          const certKey = await StorageService.getPreference('certificationKey');
+
+          if (certKey) {
+            debugOutput.push(`✅ KEY FOUND\n`);
+            debugOutput.push(`Length: ${certKey.length} characters\n`);
+            debugOutput.push(`First 8 chars: ${certKey.substring(0, 8)}...\n`);
+            debugOutput.push(`Last 4 chars: ...${certKey.substring(certKey.length - 4)}\n\n`);
+          } else {
+            debugOutput.push(`❌ KEY NOT FOUND\n\n`);
+          }
+
+          // Check localStorage backup
+          if (!StorageService.isPrivateMode) {
+            try {
+              const localStorageKey = StorageService.getUserStorageKey();
+              const localData = localStorage.getItem(localStorageKey);
+              if (localData) {
+                const parsed = JSON.parse(localData);
+                const localCertKey = parsed?.preferences?.certificationKey;
+                debugOutput.push(`localStorage Backup:\n`);
+                if (localCertKey) {
+                  debugOutput.push(`  ✅ Key found (${localCertKey.length} chars)\n`);
+                } else {
+                  debugOutput.push(`  ❌ No key in backup\n`);
+                }
+              } else {
+                debugOutput.push(`localStorage: No data\n`);
+              }
+            } catch (e) {
+              debugOutput.push(`localStorage Error: ${e.message}\n`);
+            }
+          } else {
+            debugOutput.push(`localStorage: Unavailable (Private Mode)\n`);
+          }
+
+          // Get all preferences to see what else is there
+          debugOutput.push(`\nAll Preferences:\n`);
+          const allPrefs = await StorageService.getPreferences();
+          for (const [key, value] of Object.entries(allPrefs)) {
+            if (key === 'certificationKey') {
+              debugOutput.push(`  ${key}: ${value ? '✅ Present' : '❌ Missing'}\n`);
+            } else if (typeof value === 'object') {
+              debugOutput.push(`  ${key}: ${JSON.stringify(value)}\n`);
+            } else {
+              debugOutput.push(`  ${key}: ${value}\n`);
+            }
+          }
+
+          // Display the results
+          if (certDebugInfo && certDebugPanel) {
+            certDebugInfo.textContent = debugOutput.join('');
+            certDebugPanel.style.display = 'block';
+
+            // Scroll to the debug panel
+            certDebugPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+
+          // Show toast
+          if (certKey) {
+            Utils.showToast(`✅ Certificate key found (${certKey.length} chars)`, 'success');
+          } else {
+            Utils.showToast('❌ No certificate key found', 'error');
+          }
+
+        } catch (error) {
+          if (certDebugInfo && certDebugPanel) {
+            certDebugInfo.textContent = `ERROR:\n${error.message}\n\nStack:\n${error.stack}`;
+            certDebugPanel.style.display = 'block';
+          }
+          Utils.showToast('Error checking key: ' + error.message, 'error');
+        } finally {
+          checkCertKeyBtn.disabled = false;
+          checkCertKeyBtn.textContent = '🔍 Check Key Status';
+        }
+      });
+    }
 
     // Export button
     exportBtn.addEventListener('click', async () => {

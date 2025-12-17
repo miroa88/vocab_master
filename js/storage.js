@@ -257,24 +257,37 @@ const StorageService = {
 
   // Get all data
   async get() {
+    console.log('[StorageService.get] Called');
+
     // Return cache if available
     if (this.progressCache) {
+      console.log('[StorageService.get] Returning from cache');
       return this.progressCache;
     }
 
+    console.log('[StorageService.get] Cache empty, fetching data...');
+    console.log('[StorageService.get] MongoDB mode:', this.useMongoDB);
+
     if (this.useMongoDB) {
       try {
+        console.log('[StorageService.get] Fetching from MongoDB API...');
         const progress = await ApiClient.getProgress(this.currentUserId);
+
+        console.log('[StorageService.get] MongoDB response received');
+        console.log('[StorageService.get] Progress data keys:', Object.keys(progress || {}));
+        console.log('[StorageService.get] Preferences keys:', Object.keys(progress?.preferences || {}));
 
         // Debug log for certification key tracking
         if (progress?.preferences?.certificationKey) {
-          console.log('Certification key loaded from MongoDB');
+          console.log('[StorageService.get] ✓ Certification key loaded from MongoDB (length:', progress.preferences.certificationKey.length + ')');
         } else {
-          console.log('No certification key in MongoDB response');
+          console.log('[StorageService.get] ✗ No certification key in MongoDB response');
         }
 
         // Deep merge to preserve nested preferences
         this.progressCache = this._deepMerge(this.getDefault(), progress);
+
+        console.log('[StorageService.get] After merge, certificationKey:', this.progressCache?.preferences?.certificationKey ? 'Present' : 'NULL');
 
         // Also save to localStorage as backup (skip in private mode)
         this._saveLocal(this.progressCache);
@@ -634,28 +647,39 @@ const StorageService = {
 
   // Get preference
   async getPreference(key) {
+    console.log(`[StorageService] Getting preference: ${key}`);
+    console.log(`[StorageService] Cache exists: ${!!this.progressCache}`);
+    console.log(`[StorageService] MongoDB mode: ${this.useMongoDB}, Private mode: ${this.isPrivateMode}`);
+
     const data = await this.get();
     const value = data.preferences[key];
+
+    console.log(`[StorageService] Preference '${key}' from cache:`, value ? (key === 'certificationKey' ? 'Present (length: ' + value.length + ')' : value) : 'NULL/Empty');
 
     // Special handling for certificationKey - check localStorage as fallback
     // This ensures the key is never lost even if MongoDB sync has issues
     // Skip in private mode since localStorage is not available
     if (key === 'certificationKey' && !value && this.useMongoDB && !this.isPrivateMode) {
+      console.log('[StorageService] Certification key not in cache, checking localStorage backup...');
       try {
         const localData = localStorage.getItem(this.getUserStorageKey());
         if (localData) {
           const parsed = JSON.parse(localData);
           const localCertKey = parsed?.preferences?.certificationKey;
           if (localCertKey) {
-            console.log('Certification key recovered from localStorage backup');
+            console.log('[StorageService] Certification key recovered from localStorage backup');
             // Update cache with recovered key
             data.preferences.certificationKey = localCertKey;
             this.progressCache = data;
             return localCertKey;
+          } else {
+            console.log('[StorageService] No certification key in localStorage backup either');
           }
+        } else {
+          console.log('[StorageService] No localStorage data found');
         }
       } catch (error) {
-        console.warn('Failed to check localStorage for certification key:', error);
+        console.warn('[StorageService] Failed to check localStorage for certification key:', error);
       }
     }
 

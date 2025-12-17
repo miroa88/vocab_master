@@ -2,6 +2,11 @@
 // Edit this file to switch between production and local development servers
 
 const AppConfig = {
+  // Version Information
+  VERSION: '1.0.2',
+  BUILD_DATE: '2025-12-16',
+  BUILD_TIME: new Date().toISOString(),
+
   // Backend Server Configuration
   // Uncomment ONE of the following options:
 
@@ -19,3 +24,7 @@ const AppConfig = {
 
 // Make config globally available
 window.AppConfig = AppConfig;
+
+// Log version info to console
+console.log(`%cVocab Master ${AppConfig.VERSION}`, 'font-weight: bold; color: #3B82F6; font-size: 14px');
+console.log(`Build: ${AppConfig.BUILD_DATE}`);

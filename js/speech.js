@@ -79,8 +79,12 @@ const SpeechService = {
 
   // Speak text
   async speak(text, options = {}) {
+    console.log('[SpeechService] Attempting to speak:', text);
     const certificate = await StorageService.getPreference("certificationKey");
+    console.log('[SpeechService] Certificate retrieved:', certificate ? 'Present (length: ' + certificate.length + ')' : 'NULL/Empty');
+
     if (!certificate) {
+      console.warn('[SpeechService] No certification key found - falling back to browser voice');
       Utils.showToast(
         "Add your certificate in Settings to enable cloud TTS. Using browser voice.",
         "info"
@@ -89,11 +93,12 @@ const SpeechService = {
     }
 
     try {
+      console.log('[SpeechService] Using backend TTS with certificate');
       await this.speakWithBackend(text, certificate, options);
       return true;
     } catch (error) {
       console.error(
-        "Backend TTS failed, falling back to browser speech",
+        "[SpeechService] Backend TTS failed, falling back to browser speech",
         error
       );
       Utils.showToast("Cloud TTS failed, using browser voice", "error");
