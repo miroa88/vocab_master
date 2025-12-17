@@ -108,6 +108,17 @@ const SpeechService = {
       "https://vocab-master-backend.onrender.com";
     const url = `${baseUrl.replace(/\/$/, "")}/synthesize`;
 
+    // Ensure AudioContext is created FIRST (before any async operations)
+    // This is critical for iOS - AudioContext must be created synchronously in user gesture
+    if (!this.audioContext) {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    // Start resuming AudioContext immediately (don't await yet to keep gesture context)
+    const resumePromise = this.audioContext.state === 'suspended'
+      ? this.audioContext.resume()
+      : Promise.resolve();
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -125,24 +136,17 @@ const SpeechService = {
       throw new Error(errorMessage);
     }
 
-    // Ensure AudioContext is created and unlocked (Safari/iOS fix)
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    // Resume AudioContext if suspended (Safari/iOS requires user gesture)
-    if (this.audioContext.state === 'suspended') {
-      try {
-        await this.audioContext.resume();
-        console.log('AudioContext resumed before playback');
-      } catch (error) {
-        console.warn('Failed to resume AudioContext:', error);
-      }
-    }
-
-    // Read raw audio and play
+    // Read raw audio and decode
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+    // Ensure AudioContext is resumed before playing (await the resume we started earlier)
+    try {
+      await resumePromise;
+      console.log('AudioContext resumed before playback');
+    } catch (error) {
+      console.warn('Failed to resume AudioContext:', error);
+    }
 
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;

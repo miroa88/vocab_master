@@ -461,6 +461,17 @@ const FlashcardMode = {
     const word = this.currentWords[this.currentIndex];
     if (!word) return;
 
+    // CRITICAL: Resume AudioContext SYNCHRONOUSLY in the gesture handler (iOS requirement)
+    // DO NOT use await here - it breaks the user gesture chain on iOS Safari
+    if (window.SpeechService?.audioContext) {
+      if (window.SpeechService.audioContext.state === 'suspended') {
+        // Call resume() synchronously without await to maintain gesture context
+        window.SpeechService.audioContext.resume()
+          .then(() => console.log('AudioContext resumed in click handler'))
+          .catch(e => console.warn('Failed to resume AudioContext:', e));
+      }
+    }
+
     const speakBtn = document.getElementById('speak-btn');
     speakBtn.classList.add('speaking');
 
