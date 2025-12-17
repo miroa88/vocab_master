@@ -3,6 +3,7 @@
 const SpeechService = {
   synth: window.speechSynthesis,
   audioContext: null, // Lazy initialization for Safari/iOS
+  audioElement: null, // HTML5 audio element for iOS silent mode bypass
   voices: [],
   currentUtterance: null,
   settings: {
@@ -29,7 +30,24 @@ const SpeechService = {
     // Setup AudioContext unlock on first user gesture (Safari/iOS fix)
     this.setupAudioContextUnlock();
 
+    // Create HTML5 audio element for iOS silent mode bypass
+    this.setupAudioElement();
+
     return true;
+  },
+
+  // Setup HTML5 audio element for iOS silent mode bypass
+  setupAudioElement() {
+    if (!this.audioElement) {
+      this.audioElement = new Audio();
+      // Set properties to maximize chance of bypassing silent mode
+      this.audioElement.preload = 'auto';
+      this.audioElement.volume = 1.0;
+      // On iOS, setting these attributes can help
+      this.audioElement.setAttribute('playsinline', '');
+      this.audioElement.setAttribute('webkit-playsinline', '');
+      console.log('[SpeechService] HTML5 Audio element created for iOS silent mode bypass');
+    }
   },
 
   // Setup AudioContext unlock on first user gesture (Safari/iOS compatibility)
@@ -116,24 +134,9 @@ const SpeechService = {
       "https://vocab-master-backend.onrender.com";
     const url = `${baseUrl.replace(/\/$/, "")}/synthesize`;
 
-    // Ensure AudioContext exists - should have been created by setupAudioContextUnlock
-    if (!this.audioContext) {
-      console.warn('[SpeechService] AudioContext not initialized, creating now');
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    console.log('[SpeechService] AudioContext state before fetch:', this.audioContext.state);
-
-    // Resume AudioContext if suspended - critical for iOS Safari
-    // Must be called in the same call stack as the user gesture
-    if (this.audioContext.state === 'suspended') {
-      try {
-        await this.audioContext.resume();
-        console.log('[SpeechService] AudioContext resumed, state:', this.audioContext.state);
-      } catch (error) {
-        console.warn('[SpeechService] Failed to resume AudioContext:', error);
-      }
-    }
+    // iOS Detection
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    console.log('[SpeechService] iOS detected:', isIOS);
 
     const response = await fetch(url, {
       method: "POST",
@@ -152,22 +155,84 @@ const SpeechService = {
       throw new Error(errorMessage);
     }
 
-    // Read raw audio and decode
+    // Read raw audio data
     const arrayBuffer = await response.arrayBuffer();
     console.log('[SpeechService] Audio buffer received, size:', arrayBuffer.byteLength);
 
-    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-    console.log('[SpeechService] Audio decoded, duration:', audioBuffer.duration, 'seconds');
+    // iOS Silent Mode Bypass: Use HTML5 Audio element with Blob URL
+    if (isIOS && this.audioElement) {
+      return this.playWithAudioElement(arrayBuffer, options);
+    }
 
-    // Final check - ensure AudioContext is running
+    // Fallback to Web Audio API for non-iOS or if audio element not available
+    return this.playWithWebAudio(arrayBuffer, options);
+  },
+
+  // Play audio using HTML5 Audio element (better for iOS silent mode bypass)
+  async playWithAudioElement(arrayBuffer, options = {}) {
+    try {
+      // Create a Blob from the array buffer
+      const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Set the audio source
+      this.audioElement.src = blobUrl;
+      this.audioElement.volume = 1.0;
+
+      // Setup event handlers
+      this.audioElement.onended = () => {
+        console.log('[SpeechService] HTML5 Audio playback ended');
+        URL.revokeObjectURL(blobUrl); // Clean up
+        if (options.onEnd) options.onEnd();
+      };
+
+      this.audioElement.onerror = (error) => {
+        console.error('[SpeechService] HTML5 Audio error:', error);
+        URL.revokeObjectURL(blobUrl);
+        if (options.onError) options.onError(error);
+      };
+
+      if (options.onStart) options.onStart();
+
+      // Play the audio
+      console.log('[SpeechService] Starting HTML5 Audio playback (iOS silent mode bypass)');
+      const playPromise = this.audioElement.play();
+
+      if (playPromise !== undefined) {
+        await playPromise;
+        console.log('[SpeechService] HTML5 Audio playback started successfully');
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[SpeechService] HTML5 Audio playback failed:', error);
+      // Fallback to Web Audio API
+      return this.playWithWebAudio(arrayBuffer, options);
+    }
+  },
+
+  // Play audio using Web Audio API (original method)
+  async playWithWebAudio(arrayBuffer, options = {}) {
+    // Ensure AudioContext exists
+    if (!this.audioContext) {
+      console.warn('[SpeechService] AudioContext not initialized, creating now');
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    console.log('[SpeechService] AudioContext state before playback:', this.audioContext.state);
+
+    // Resume AudioContext if suspended
     if (this.audioContext.state === 'suspended') {
-      console.warn('[SpeechService] AudioContext still suspended, attempting resume again');
       try {
         await this.audioContext.resume();
+        console.log('[SpeechService] AudioContext resumed, state:', this.audioContext.state);
       } catch (error) {
-        console.error('[SpeechService] Failed final resume attempt:', error);
+        console.warn('[SpeechService] Failed to resume AudioContext:', error);
       }
     }
+
+    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    console.log('[SpeechService] Audio decoded, duration:', audioBuffer.duration, 'seconds');
 
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
@@ -175,12 +240,13 @@ const SpeechService = {
 
     if (options.onStart) options.onStart();
     source.onended = () => {
-      console.log('[SpeechService] Audio playback ended');
+      console.log('[SpeechService] Web Audio playback ended');
       if (options.onEnd) options.onEnd();
     };
 
-    console.log('[SpeechService] Starting audio playback, AudioContext state:', this.audioContext.state);
+    console.log('[SpeechService] Starting Web Audio playback, AudioContext state:', this.audioContext.state);
     source.start(0);
+    return true;
   },
 
   // Speak with browser's Web Speech API
