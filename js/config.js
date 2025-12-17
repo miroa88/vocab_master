@@ -3,7 +3,7 @@
 
 const AppConfig = {
   // Version Information
-  VERSION: '1.0.2',
+  VERSION: '1.1.0',
   BUILD_DATE: '2025-12-16',
   BUILD_TIME: new Date().toISOString(),
 
