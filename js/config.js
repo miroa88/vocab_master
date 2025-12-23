@@ -1,10 +1,10 @@
 const AppConfig = {
-  VERSION: '1.1.2',
+  VERSION: '1.1.3',
   BUILD_DATE: '2024-12-16',
   BUILD_TIME: new Date().toISOString(),
 
-  API_BASE_URL: 'https://vocab-master-backend.onrender.com',
-
+  API_BASE_URL: 'https://instyle-node-server.onrender.com',
+  // API_BASE_URL: 'http://localhost:5000',
   USE_MONGODB: true,
   ENABLE_OFFLINE_MODE: false,
 };

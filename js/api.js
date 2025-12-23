@@ -131,7 +131,7 @@ const ApiClient = {
    */
   async registerUser(username, password) {
     const response = await this.post(
-      "/api/auth/register",
+      "/api/vocab/auth/register",
       { username, password },
       { requiresAuth: false }
     );
@@ -143,7 +143,7 @@ const ApiClient = {
 
   async loginUser(username, password) {
     const response = await this.post(
-      "/api/auth/login",
+      "/api/vocab/auth/login",
       { username, password },
       { requiresAuth: false }
     );
@@ -155,7 +155,7 @@ const ApiClient = {
 
   async setupPassword(username, password) {
     const response = await this.post(
-      "/api/auth/setup-password",
+      "/api/vocab/auth/setup-password",
       { username, password },
       { requiresAuth: false }
     );
@@ -170,119 +170,126 @@ const ApiClient = {
   },
 
   async getAllUsers() {
-    return this.get("/api/users", { requiresAuth: false });
+    return this.get("/api/vocab/users", { requiresAuth: false });
   },
 
   async getUser(userId) {
-    return this.get(`/api/users/${userId}`);
+    return this.get(`/api/vocab/users/${userId}`);
   },
 
   async updateUser(userId, username) {
-    return this.put(`/api/users/${userId}`, { username });
+    return this.put(`/api/vocab/users/${userId}`, { username });
   },
 
   async deleteUser(userId) {
-    return this.delete(`/api/users/${userId}`);
+    return this.delete(`/api/vocab/users/${userId}`);
   },
 
   /**
    * Progress APIs
    */
   async getProgress(userId) {
-    return this.get(`/api/users/${userId}/progress`);
+    return this.get(`/api/vocab/users/${userId}/progress`);
   },
 
   async updateProgress(userId, progressData) {
-    return this.put(`/api/users/${userId}/progress`, progressData);
+    return this.put(`/api/vocab/users/${userId}/progress`, progressData);
   },
 
   async markLearned(userId, wordId, learned = true) {
-    return this.patch(`/api/users/${userId}/learned`, { wordId, learned });
+    return this.patch(`/api/vocab/users/${userId}/learned`, { wordId, learned });
   },
 
   async getStats(userId) {
-    return this.get(`/api/users/${userId}/stats`);
+    return this.get(`/api/vocab/users/${userId}/stats`);
   },
 
   async updateStreak(userId, streakData) {
-    return this.patch(`/api/users/${userId}/streak`, streakData);
+    return this.patch(`/api/vocab/users/${userId}/streak`, streakData);
   },
 
   /**
    * Quiz & Session APIs
    */
   async submitQuiz(userId, wordId, correct) {
-    return this.post(`/api/users/${userId}/quiz`, { wordId, correct });
+    return this.post(`/api/vocab/users/${userId}/quiz`, { wordId, correct });
   },
 
   async addSession(userId, sessionData) {
-    return this.post(`/api/users/${userId}/sessions`, sessionData);
+    return this.post(`/api/vocab/users/${userId}/sessions`, sessionData);
   },
 
   async getSessions(userId, limit = 30) {
-    return this.get(`/api/users/${userId}/sessions?limit=${limit}`);
+    return this.get(`/api/vocab/users/${userId}/sessions?limit=${limit}`);
   },
 
   /**
    * Preferences APIs
    */
   async getPreferences(userId) {
-    return this.get(`/api/users/${userId}/preferences`);
+    return this.get(`/api/vocab/users/${userId}/preferences`);
   },
 
   async updatePreference(userId, key, value) {
-    return this.patch(`/api/users/${userId}/preferences/${key}`, { value });
+    return this.patch(`/api/vocab/users/${userId}/preferences/${key}`, { value });
   },
 
   /**
    * Vocabulary APIs
    */
   async getAllVocabs() {
-    return this.get("/api/vocabs", { requiresAuth: false });
+    return this.get("/api/vocab/vocabs", { requiresAuth: false });
   },
 
   async getVocab(id) {
-    return this.get(`/api/vocabs/${id}`, { requiresAuth: false });
+    return this.get(`/api/vocab/vocabs/${id}`, { requiresAuth: false });
   },
 
   async searchVocabs(query) {
-    return this.get(`/api/vocabs/search?q=${encodeURIComponent(query)}`, {
+    return this.get(`/api/vocab/vocabs/search?q=${encodeURIComponent(query)}`, {
       requiresAuth: false,
     });
   },
 
   async getVocabMetadata() {
-    return this.get("/api/vocabs/metadata", { requiresAuth: false });
+    return this.get("/api/vocab/vocabs/metadata", { requiresAuth: false });
   },
 
   /**
    * Migration APIs
    */
   async importLocalStorageData(data) {
-    return this.post("/api/migration/import", data, { requiresAuth: false });
+    return this.post("/api/vocab/migration/import", data, { requiresAuth: false });
   },
 
   async exportUserData(userId) {
-    return this.get(`/api/users/${userId}/export`);
+    return this.get(`/api/vocab/users/${userId}/export`);
   },
 
   /**
    * Certification Key APIs
    */
   async validateCertificationKey(certificationKey) {
-    return this.post("/api/certification/validate", { certificationKey }, { requiresAuth: false });
+    return this.post("/api/vocab/certification/validate", { certificationKey }, { requiresAuth: false });
   },
 
   async activateCertificationKey(userId, certificationKey) {
-    return this.post(`/api/users/${userId}/certification`, { certificationKey });
+    return this.post(`/api/vocab/users/${userId}/certification`, { certificationKey });
   },
 
   async getCertificationStatus(userId) {
-    return this.get(`/api/users/${userId}/certification`);
+    return this.get(`/api/vocab/users/${userId}/certification`);
   },
 
   async revokeCertificationKey(userId) {
-    return this.delete(`/api/users/${userId}/certification`);
+    return this.delete(`/api/vocab/users/${userId}/certification`);
+  },
+
+  /**
+   * Generate AI examples for a vocabulary word
+   */
+  async generateExamples(wordId) {
+    return this.post(`/api/vocab/examples/generate`, { wordId });
   },
 };
 

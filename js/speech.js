@@ -102,8 +102,8 @@ const SpeechService = {
   async speakWithBackend(text, certificate, options = {}) {
     const baseUrl =
       (window.AppConfig && window.AppConfig.API_BASE_URL) ||
-      "https://vocab-master-backend.onrender.com";
-    const url = `${baseUrl.replace(/\/$/, "")}/synthesize`;
+      "https://instyle-node-server.onrender.com";
+    const url = `${baseUrl.replace(/\/$/, "")}/vocab/synthesize`;
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 

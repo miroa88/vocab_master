@@ -48,6 +48,7 @@ const FlashcardMode = {
     const speakBtn = document.getElementById('speak-btn');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const filterBtn = document.getElementById('filter-btn');
+    const generateExamplesBtn = document.getElementById('generate-examples-btn');
     const searchInput = document.getElementById('search-input');
 
     // Flashcard click to flip
@@ -83,6 +84,12 @@ const FlashcardMode = {
 
     // Filter button
     filterBtn.addEventListener('click', () => this.toggleFilterPanel());
+
+    // Generate examples button
+    generateExamplesBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.generateNewExamples();
+    });
 
     // Search input
     const debouncedSearch = Utils.debounce(async (value) => {
@@ -483,10 +490,91 @@ const FlashcardMode = {
     Utils.showToast('Cards shuffled!', 'success');
   },
 
+  // Generate new examples using AI
+  async generateNewExamples() {
+    const word = this.currentWords[this.currentIndex];
+    if (!word) return;
+
+    const btn = document.getElementById('generate-examples-btn');
+    const examplesContainer = document.getElementById('examples-container');
+
+    // Show loading state
+    btn.classList.add('loading');
+    btn.disabled = true;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span><span>Generating...</span>';
+
+    try {
+      // Call backend API
+      const response = await ApiClient.generateExamples(word.id);
+
+      if (!response.success || !response.examples || response.examples.length !== 2) {
+        throw new Error('Invalid response format from server');
+      }
+
+      // Clear current examples
+      examplesContainer.innerHTML = '';
+
+      // Add new examples with animation
+      response.examples.forEach((example, index) => {
+        const card = document.createElement('div');
+        card.className = 'example-card';
+        card.style.animation = `fadeIn 0.3s ease-in-out ${index * 100}ms`;
+
+        const p = document.createElement('p');
+        p.innerHTML = `
+          ${this.escapeHtml(example)}
+          <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(example)}"
+                  title="Speak example">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+        `;
+
+        card.appendChild(p);
+        examplesContainer.appendChild(card);
+      });
+
+      // Re-attach speak listeners
+      this.setupInlineSpeakButtons();
+
+      Utils.showToast('Examples generated successfully!', 'success');
+    } catch (error) {
+      console.error('Failed to generate examples:', error);
+      const errorMessage = error.details?.message || error.message || 'Failed to generate examples';
+      Utils.showToast(errorMessage, 'error');
+    } finally {
+      // Restore button state
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  },
+
   // Toggle filter panel
   toggleFilterPanel() {
     const filterPanel = document.getElementById('filter-panel');
+    const isHidden = filterPanel.classList.contains('hidden');
+
     filterPanel.classList.toggle('hidden');
+
+    // When opening the filter panel, set Unlearned as default if currently on "All"
+    if (isHidden && this.filters.status === 'all') {
+      const statusFilters = filterPanel.querySelectorAll('[data-filter]');
+      statusFilters.forEach(btn => btn.classList.remove('active'));
+
+      const unlearnedBtn = filterPanel.querySelector('[data-filter="unlearned"]');
+      if (unlearnedBtn) {
+        unlearnedBtn.classList.add('active');
+        this.filters.status = 'unlearned';
+        this.loadWords().then(() => {
+          this.renderCard();
+          this.updateCardCounter();
+        });
+      }
+    }
   },
 
   // Update card counter
