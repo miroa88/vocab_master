@@ -3,8 +3,8 @@ const AppConfig = {
   BUILD_DATE: '2024-12-25',
   BUILD_TIME: new Date().toISOString(),
 
-  // API_BASE_URL: 'https://instyle-node-server.onrender.com',
-  API_BASE_URL: 'http://localhost:5000',
+  API_BASE_URL: 'https://instyle-node-server.onrender.com',
+  // API_BASE_URL: 'http://localhost:5000',
   USE_MONGODB: true,
   ENABLE_OFFLINE_MODE: false,
 };
