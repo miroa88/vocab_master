@@ -12,15 +12,28 @@ const FlashcardMode = {
   enableSwipe: true,
   touchStartX: 0,
   touchEndX: 0,
+  translationCache: new Map(),
+  translationStates: new Map(),
+  currentTargetLanguage: null,
 
   // Initialize flashcard mode
   async init() {
     await this.loadWords();
     const swipePref = await StorageService.getPreference('enableSwipe');
     this.enableSwipe = swipePref !== false;
+
+    await this.loadTranslationLanguage();
+
     this.setupEventListeners();
     await this.renderCard();
     await this.updateProgress();
+  },
+
+  // Load translation language preference
+  async loadTranslationLanguage() {
+    const enabledLanguages = await StorageService.getPreference('translationLanguages') || ['Hy'];
+    this.currentTargetLanguage = enabledLanguages[0];
+    console.log('Translation target language:', this.currentTargetLanguage);
   },
 
   // Load words based on filters
@@ -216,6 +229,9 @@ const FlashcardMode = {
 
   // Render current card
   async renderCard() {
+    // Clear translation states when changing cards
+    this.translationStates.clear();
+
     if (this.currentWords.length === 0) {
       this.showEmptyState();
       return;
@@ -287,13 +303,18 @@ const FlashcardMode = {
       if (tapHint) tapHint.textContent = 'Tap to flip';
     }
 
-    // Set definition (for back side) with speak button
+    // Set definition (for back side) with speak and translate buttons
     definitionText.innerHTML = `
-      ${word.definition}
+      <span class="translatable-text" data-element-id="definition">${word.definition}</span>
       <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(word.definition)}" title="Speak definition">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
           <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+      <button class="translate-btn inline-translate-btn" data-element-id="definition" data-original-text="${this.escapeHtml(word.definition)}" title="Translate definition">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
         </svg>
       </button>
     `;
@@ -319,28 +340,60 @@ const FlashcardMode = {
       translationsContainer.appendChild(item);
     });
 
-    // Set synonyms
+    // Set synonyms with translate button
     synonymsContainer.innerHTML = '';
-    word.synonyms.forEach(synonym => {
-      const badge = document.createElement('span');
-      badge.className = 'synonym-badge';
-      badge.textContent = synonym;
-      synonymsContainer.appendChild(badge);
-    });
 
-    // Set examples with speak buttons
+    if (word.synonyms && word.synonyms.length > 0) {
+      const synonymsWrapper = document.createElement('div');
+      synonymsWrapper.className = 'synonyms-wrapper';
+
+      const synonymsTextContainer = document.createElement('div');
+      synonymsTextContainer.className = 'synonyms-badges-container';
+
+      word.synonyms.forEach(synonym => {
+        const badge = document.createElement('span');
+        badge.className = 'synonym-badge';
+        badge.textContent = synonym;
+        synonymsTextContainer.appendChild(badge);
+      });
+
+      const synonymsText = word.synonyms.join(', ');
+      const translateBtn = document.createElement('button');
+      translateBtn.className = 'translate-btn inline-translate-btn';
+      translateBtn.setAttribute('data-element-id', 'synonyms');
+      translateBtn.setAttribute('data-original-text', this.escapeHtml(synonymsText));
+      translateBtn.setAttribute('title', 'Translate all synonyms');
+      translateBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+        </svg>
+      `;
+
+      synonymsWrapper.appendChild(synonymsTextContainer);
+      synonymsWrapper.appendChild(translateBtn);
+      synonymsContainer.appendChild(synonymsWrapper);
+    }
+
+    // Set examples with speak and translate buttons
     examplesContainer.innerHTML = '';
-    word.examples.forEach(example => {
+    word.examples.forEach((example, index) => {
       const card = document.createElement('div');
       card.className = 'example-card';
 
+      const elementId = `example-${index}`;
+
       const p = document.createElement('p');
       p.innerHTML = `
-        ${example}
+        <span class="translatable-text" data-element-id="${elementId}">${example}</span>
         <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(example)}" title="Speak example">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <button class="translate-btn inline-translate-btn" data-element-id="${elementId}" data-original-text="${this.escapeHtml(example)}" title="Translate example">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
           </svg>
         </button>
       `;
@@ -351,6 +404,9 @@ const FlashcardMode = {
 
     // Setup speak button listeners for definition and examples
     this.setupInlineSpeakButtons();
+
+    // Setup translate button listeners
+    this.setupInlineTranslateButtons();
 
     // Update learned status
     await this.updateLearnedButton();
@@ -633,6 +689,124 @@ const FlashcardMode = {
         }
       });
     });
+  },
+
+  // Setup inline translate button listeners
+  setupInlineTranslateButtons() {
+    const inlineTranslateBtns = document.querySelectorAll('.inline-translate-btn');
+    inlineTranslateBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card flip
+        this.handleTranslateClick(btn);
+      });
+    });
+  },
+
+  // Handle translate button click
+  async handleTranslateClick(btn) {
+    const elementId = btn.getAttribute('data-element-id');
+    const originalText = btn.getAttribute('data-original-text');
+
+    if (!elementId || !originalText) return;
+
+    let textElement;
+    if (elementId === 'definition') {
+      textElement = document.querySelector('.definition-text .translatable-text');
+    } else if (elementId === 'synonyms') {
+      textElement = document.querySelector('.synonyms-badges-container');
+    } else {
+      textElement = document.querySelector(`.translatable-text[data-element-id="${elementId}"]`);
+    }
+
+    if (!textElement) return;
+
+    const currentState = this.translationStates.get(elementId);
+
+    if (currentState === 'translated') {
+      // Toggle back to English
+      if (elementId === 'synonyms') {
+        const synonyms = originalText.split(', ');
+        textElement.innerHTML = '';
+        synonyms.forEach(synonym => {
+          const badge = document.createElement('span');
+          badge.className = 'synonym-badge';
+          badge.textContent = synonym;
+          textElement.appendChild(badge);
+        });
+      } else {
+        textElement.textContent = originalText;
+        textElement.classList.remove('translated');
+      }
+      this.translationStates.set(elementId, 'original');
+      btn.classList.remove('active');
+      return;
+    }
+
+    const cacheKey = `${originalText}_${this.currentTargetLanguage}`;
+    const cachedTranslation = this.translationCache.get(cacheKey);
+
+    if (cachedTranslation) {
+      if (elementId === 'synonyms') {
+        const translatedSynonyms = cachedTranslation.split(', ');
+        textElement.innerHTML = '';
+        translatedSynonyms.forEach(synonym => {
+          const badge = document.createElement('span');
+          badge.className = 'synonym-badge translated';
+          badge.textContent = synonym;
+          textElement.appendChild(badge);
+        });
+      } else {
+        textElement.textContent = cachedTranslation;
+        textElement.classList.add('translated');
+      }
+      this.translationStates.set(elementId, 'translated');
+      btn.classList.add('active');
+      return;
+    }
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+    const originalBtnHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      await this.loadTranslationLanguage();
+
+      const response = await ApiClient.translateText(originalText, this.currentTargetLanguage);
+
+      if (!response.success || !response.translation) {
+        throw new Error('Invalid translation response');
+      }
+
+      const translation = response.translation;
+      this.translationCache.set(cacheKey, translation);
+
+      if (elementId === 'synonyms') {
+        const translatedSynonyms = translation.split(',').map(s => s.trim());
+        textElement.innerHTML = '';
+        translatedSynonyms.forEach(synonym => {
+          const badge = document.createElement('span');
+          badge.className = 'synonym-badge translated';
+          badge.textContent = synonym;
+          textElement.appendChild(badge);
+        });
+      } else {
+        textElement.textContent = translation;
+        textElement.classList.add('translated');
+      }
+
+      this.translationStates.set(elementId, 'translated');
+      btn.classList.add('active');
+
+    } catch (error) {
+      console.error('Translation failed:', error);
+      const errorMessage = error.details?.message || error.message || 'Failed to translate';
+      Utils.showToast(errorMessage, 'error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+    }
   },
 
   // Escape HTML to prevent XSS

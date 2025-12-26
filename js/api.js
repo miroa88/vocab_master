@@ -291,6 +291,17 @@ const ApiClient = {
   async generateExamples(wordId) {
     return this.post(`/api/vocab/examples/generate`, { wordId });
   },
+
+  /**
+   * Translate text to target language
+   */
+  async translateText(text, targetLanguage, sourceLanguage = 'en') {
+    return this.post('/api/vocab/translate', {
+      text,
+      targetLanguage,
+      sourceLanguage
+    });
+  },
 };
 
 // Initialize on load

@@ -358,20 +358,24 @@ const App = {
     // Language checkboxes
     const langHy = document.getElementById('lang-hy');
     const langFa = document.getElementById('lang-fa');
-    const langEn = document.getElementById('lang-en');
 
     // Load saved language preferences
     const savedLanguages = await StorageService.getPreference('translationLanguages') || ['Hy'];
     langHy.checked = savedLanguages.includes('Hy');
     langFa.checked = savedLanguages.includes('Fa');
-    langEn.checked = savedLanguages.includes('En');
 
-    // Language preference change handlers
-    const updateLanguagePreferences = async () => {
+    // Language preference change handlers with validation
+    const updateLanguagePreferences = async (changedCheckbox) => {
       const enabledLanguages = [];
       if (langHy.checked) enabledLanguages.push('Hy');
       if (langFa.checked) enabledLanguages.push('Fa');
-      if (langEn.checked) enabledLanguages.push('En');
+
+      // Validation: At least one language must be selected
+      if (enabledLanguages.length === 0) {
+        Utils.showToast('At least one language must be selected', 'error');
+        changedCheckbox.checked = true; // Revert
+        return;
+      }
 
       await StorageService.updatePreference('translationLanguages', enabledLanguages);
 
@@ -379,10 +383,12 @@ const App = {
       if (typeof FlashcardMode !== 'undefined' && FlashcardMode.renderCard) {
         FlashcardMode.renderCard();
       }
+
+      Utils.showToast('Language preferences updated', 'success');
     };
 
-    langFa.addEventListener('change', updateLanguagePreferences);
-    langEn.addEventListener('change', updateLanguagePreferences);
+    langHy.addEventListener('change', (e) => updateLanguagePreferences(e.target));
+    langFa.addEventListener('change', (e) => updateLanguagePreferences(e.target));
 
     // Reverse mode toggle
     reverseModeToggle.addEventListener('change', async (e) => {
