@@ -10,9 +10,13 @@ const StatsMode = {
   async render() {
     await this.renderOverallProgress();
     await this.renderStreak();
+    await this.renderLongestStreak();
     await this.renderWeeklyWords();
     await this.renderStudyTime();
     await this.renderQuizAverage();
+    await this.renderTotalQuizzes();
+    await this.renderDetailedStats();
+    await this.renderQuizBreakdown();
     await this.renderRecentSessions();
   },
 
@@ -86,13 +90,145 @@ const StatsMode = {
     quizAvgEl.textContent = `${average}%`;
 
     // Color code based on performance
-    const card = quizAvgEl.closest('.stat-card');
     if (average >= 80) {
       quizAvgEl.style.color = 'var(--success)';
     } else if (average >= 60) {
       quizAvgEl.style.color = 'var(--warning)';
-    } else {
+    } else if (average > 0) {
       quizAvgEl.style.color = 'var(--error)';
+    }
+  },
+
+  // Render longest streak
+  async renderLongestStreak() {
+    const stats = await StorageService.getStats();
+    const longestStreakEl = document.getElementById('longest-streak');
+    const longestStreak = stats.longestStreak || 0;
+
+    longestStreakEl.textContent = `${longestStreak} ${longestStreak === 1 ? 'day' : 'days'}`;
+  },
+
+  // Render total quizzes taken
+  async renderTotalQuizzes() {
+    const stats = await StorageService.getStats();
+    const totalQuizzesEl = document.getElementById('total-quizzes');
+
+    totalQuizzesEl.textContent = stats.totalQuizzesTaken || 0;
+  },
+
+  // Render detailed statistics
+  async renderDetailedStats() {
+    const stats = await StorageService.getStats();
+    const data = await StorageService.get();
+
+    // Total sessions
+    const totalSessionsEl = document.getElementById('total-sessions');
+    totalSessionsEl.textContent = data.sessions.length;
+
+    // Average session duration
+    const avgDurationEl = document.getElementById('avg-session-duration');
+    if (data.sessions.length > 0) {
+      const totalDuration = data.sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+      const avgDuration = Math.round(totalDuration / data.sessions.length);
+      avgDurationEl.textContent = Utils.formatTime(avgDuration);
+    } else {
+      avgDurationEl.textContent = '0 min';
+    }
+
+    // Words learned today
+    const wordsTodayEl = document.getElementById('words-today');
+    const today = Utils.getCurrentDate();
+    const todaySession = data.sessions.find(s => s.date === today);
+    wordsTodayEl.textContent = todaySession?.wordsLearned || 0;
+
+    // Last study date
+    const lastStudyEl = document.getElementById('last-study-date');
+    if (stats.lastStudyDate) {
+      lastStudyEl.textContent = Utils.formatDate(stats.lastStudyDate);
+    } else {
+      lastStudyEl.textContent = 'Never';
+    }
+  },
+
+  // Render quiz performance breakdown
+  async renderQuizBreakdown() {
+    const data = await StorageService.get();
+    const quizBreakdownEl = document.getElementById('quiz-breakdown');
+
+    const quizScores = data.quizScores || {};
+    const entries = Object.entries(quizScores);
+
+    if (entries.length === 0) {
+      quizBreakdownEl.innerHTML = '<p class="empty-state">No quiz data yet. Take a quiz to see your performance!</p>';
+      return;
+    }
+
+    // Calculate success rate for each word and sort by difficulty (lowest rate first)
+    const wordPerformance = entries.map(([wordId, score]) => {
+      const successRate = score.attempts > 0 ? Math.round((score.correct / score.attempts) * 100) : 0;
+      return {
+        wordId,
+        correct: score.correct,
+        attempts: score.attempts,
+        successRate
+      };
+    });
+
+    // Sort by success rate (lowest first - most challenging)
+    wordPerformance.sort((a, b) => a.successRate - b.successRate);
+
+    // Show top 10 most challenging words
+    const topChallenging = wordPerformance.slice(0, 10);
+
+    quizBreakdownEl.innerHTML = '';
+
+    for (const perf of topChallenging) {
+      // Get word details
+      const word = await DataService.getWordById(parseInt(perf.wordId));
+      if (!word) continue;
+
+      const item = document.createElement('div');
+      item.className = 'quiz-word-item';
+
+      // Add difficulty class based on success rate
+      if (perf.successRate < 50) {
+        item.classList.add('challenging');
+      } else if (perf.successRate < 75) {
+        item.classList.add('moderate');
+      } else {
+        item.classList.add('good');
+      }
+
+      const wordInfo = document.createElement('div');
+      wordInfo.className = 'quiz-word-info';
+
+      const wordName = document.createElement('div');
+      wordName.className = 'quiz-word-name';
+      wordName.textContent = word.word;
+
+      const wordStats = document.createElement('div');
+      wordStats.className = 'quiz-word-stats';
+      wordStats.textContent = `${perf.correct}/${perf.attempts} correct`;
+
+      wordInfo.appendChild(wordName);
+      wordInfo.appendChild(wordStats);
+
+      const scoreDiv = document.createElement('div');
+      scoreDiv.className = 'quiz-word-score';
+      scoreDiv.textContent = `${perf.successRate}%`;
+
+      // Color code the score
+      if (perf.successRate < 50) {
+        scoreDiv.classList.add('low');
+      } else if (perf.successRate < 75) {
+        scoreDiv.classList.add('medium');
+      } else {
+        scoreDiv.classList.add('high');
+      }
+
+      item.appendChild(wordInfo);
+      item.appendChild(scoreDiv);
+      quizBreakdownEl.appendChild(item);
     }
   },
 

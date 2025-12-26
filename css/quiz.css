@@ -195,6 +195,13 @@
   margin-bottom: var(--space-2xl);
 }
 
+#show-answer-btn {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 300px;
+}
+
 .sa-answer {
   animation: fadeIn var(--transition-base);
   margin-top: var(--space-xl);

@@ -317,6 +317,17 @@
   display: inline-block;
 }
 
+/* Inline spinner - appears in place of button */
+.inline-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -385,6 +396,30 @@
 /* Definition Section */
 .definition-section {
   margin-bottom: 24px;
+}
+
+.definition-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.definition-header h4 {
+  margin: 0;
+}
+
+.definition-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 4px;
+}
+
+.definition-actions .inline-speak-btn,
+.definition-actions .inline-translate-btn {
+  margin-left: 0;
 }
 
 .definition-section h4,
@@ -456,6 +491,29 @@
 /* Synonyms Section */
 .synonyms-section {
   margin-bottom: 24px;
+}
+
+.synonyms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.synonyms-header h4 {
+  margin: 0;
+}
+
+.synonyms-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 4px;
+}
+
+.synonyms-actions .inline-translate-btn {
+  margin-left: 0;
 }
 
 .synonyms-container {

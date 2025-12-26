@@ -201,7 +201,7 @@ body {
 }
 
 /* Loading Indicator */
-.loading {
+#loading {
   position: fixed;
   top: 0;
   left: 0;
@@ -214,7 +214,7 @@ body {
   z-index: var(--z-modal);
 }
 
-.loading.hidden {
+#loading.hidden {
   display: none;
 }
 

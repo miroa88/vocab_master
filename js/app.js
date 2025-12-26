@@ -344,8 +344,6 @@ const App = {
     }
 
     const themeToggle = document.getElementById('theme-toggle');
-    const speechRateSlider = document.getElementById('speech-rate');
-    const speechRateValue = document.getElementById('speech-rate-value');
     const autoPlayToggle = document.getElementById('auto-play');
     const reverseModeToggle = document.getElementById('reverse-mode');
     const frontTranslationToggle = document.getElementById('front-translation-toggle');
@@ -443,18 +441,6 @@ const App = {
       const theme = e.target.checked ? 'dark' : 'light';
       this.setTheme(theme);
     });
-
-    // Speech rate
-    speechRateSlider.addEventListener('input', (e) => {
-      const rate = parseFloat(e.target.value);
-      speechRateValue.textContent = `${rate}x`;
-      SpeechService.setRate(rate);
-    });
-
-    // Load saved speech rate
-    const savedRate = SpeechService.getRate();
-    speechRateSlider.value = savedRate;
-    speechRateValue.textContent = `${savedRate}x`;
 
     // Auto-play toggle
     autoPlayToggle.addEventListener('change', async (e) => {

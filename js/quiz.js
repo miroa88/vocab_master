@@ -102,7 +102,15 @@ const QuizMode = {
     const mcOptions = document.getElementById('mc-options');
 
     // Academic-styled prompt with context
-    const example = Array.isArray(word.examples) && word.examples.length > 0 ? word.examples[0] : '';
+    // Replace the answer word with dots in the context
+    let example = '';
+    if (Array.isArray(word.examples) && word.examples.length > 0) {
+      example = word.examples[0];
+      // Replace the word (case insensitive) with dots
+      const wordRegex = new RegExp(`\\b${word.word}\\b`, 'gi');
+      example = example.replace(wordRegex, '........');
+    }
+
     mcDefinition.innerHTML = `
       <div><strong>Definition:</strong> ${word.definition}</div>
       ${example ? `<div class="quiz-context">Context: ${example}</div>` : ''}

@@ -245,9 +245,11 @@ const FlashcardMode = {
     const wordBack = document.getElementById('word-back');
     const partOfSpeech = document.getElementById('part-of-speech');
     const definitionText = document.getElementById('definition-text');
+    const definitionActions = document.getElementById('definition-actions');
     const frontTranslation = document.getElementById('front-translation');
     const translationsContainer = document.getElementById('translations-container');
     const synonymsContainer = document.getElementById('synonyms-container');
+    const synonymsActions = document.getElementById('synonyms-actions');
     const examplesContainer = document.getElementById('examples-container');
 
     // Reset flip state
@@ -306,18 +308,23 @@ const FlashcardMode = {
     // Set definition (for back side) with speak and translate buttons
     definitionText.innerHTML = `
       <span class="translatable-text" data-element-id="definition">${word.definition}</span>
-      <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(word.definition)}" title="Speak definition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
-      </button>
-      <button class="translate-btn inline-translate-btn" data-element-id="definition" data-original-text="${this.escapeHtml(word.definition)}" title="Translate definition">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-        </svg>
-      </button>
     `;
+
+    if (definitionActions) {
+      definitionActions.innerHTML = `
+        <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(word.definition)}" title="Speak definition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <button class="translate-btn inline-translate-btn" data-element-id="definition" data-original-text="${this.escapeHtml(word.definition)}" title="Translate definition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+          </svg>
+        </button>
+      `;
+    }
 
     // Set translations
     translationsContainer.innerHTML = '';
@@ -342,6 +349,9 @@ const FlashcardMode = {
 
     // Set synonyms with translate button
     synonymsContainer.innerHTML = '';
+    if (synonymsActions) {
+      synonymsActions.innerHTML = '';
+    }
 
     if (word.synonyms && word.synonyms.length > 0) {
       const synonymsWrapper = document.createElement('div');
@@ -358,19 +368,18 @@ const FlashcardMode = {
       });
 
       const synonymsText = word.synonyms.join(', ');
-      const translateBtn = document.createElement('button');
-      translateBtn.className = 'translate-btn inline-translate-btn';
-      translateBtn.setAttribute('data-element-id', 'synonyms');
-      translateBtn.setAttribute('data-original-text', this.escapeHtml(synonymsText));
-      translateBtn.setAttribute('title', 'Translate all synonyms');
-      translateBtn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-        </svg>
-      `;
+
+      if (synonymsActions) {
+        synonymsActions.innerHTML = `
+          <button class="translate-btn inline-translate-btn" data-element-id="synonyms" data-original-text="${this.escapeHtml(synonymsText)}" title="Translate all synonyms">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+            </svg>
+          </button>
+        `;
+      }
 
       synonymsWrapper.appendChild(synonymsTextContainer);
-      synonymsWrapper.appendChild(translateBtn);
       synonymsContainer.appendChild(synonymsWrapper);
     }
 
@@ -764,10 +773,11 @@ const FlashcardMode = {
       return;
     }
 
+    // Show loading spinner in place of button
     btn.classList.add('loading');
     btn.disabled = true;
     const originalBtnHtml = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span>';
+    btn.innerHTML = '<span class="inline-spinner"></span>';
 
     try {
       await this.loadTranslationLanguage();

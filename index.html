@@ -165,7 +165,10 @@
                                     </div>
 
                                     <div class="definition-section">
-                                        <h4>Definition</h4>
+                                        <div class="definition-header">
+                                            <h4>Definition</h4>
+                                            <div id="definition-actions" class="definition-actions"></div>
+                                        </div>
                                         <p id="definition-text" class="definition-text">To give up completely; to desert or leave behind</p>
                                     </div>
 
@@ -177,7 +180,10 @@
                                     </div>
 
                                     <div class="synonyms-section">
-                                        <h4>Synonyms</h4>
+                                        <div class="synonyms-header">
+                                            <h4>Synonyms</h4>
+                                            <div id="synonyms-actions" class="synonyms-actions"></div>
+                                        </div>
                                         <div id="synonyms-container" class="synonyms-container">
                                             <span class="synonym-badge">desert</span>
                                             <span class="synonym-badge">forsake</span>
@@ -323,6 +329,7 @@
                 <div class="stats-container">
                     <h2>Your Progress</h2>
 
+                    <!-- Main Stats Grid -->
                     <div class="stats-grid">
                         <!-- Overall Progress -->
                         <div class="stat-card large">
@@ -344,9 +351,17 @@
                         <!-- Study Streak -->
                         <div class="stat-card">
                             <div class="stat-icon">🔥</div>
-                            <h3>Study Streak</h3>
+                            <h3>Current Streak</h3>
                             <p class="stat-value" id="streak-count">0 days</p>
                             <small class="stat-label">Keep it up!</small>
+                        </div>
+
+                        <!-- Longest Streak -->
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <h3>Best Streak</h3>
+                            <p class="stat-value" id="longest-streak">0 days</p>
+                            <small class="stat-label">Personal record</small>
                         </div>
 
                         <!-- Words This Week -->
@@ -371,6 +386,45 @@
                             <h3>Quiz Score</h3>
                             <p class="stat-value" id="quiz-average">0%</p>
                             <small class="stat-label">Average score</small>
+                        </div>
+
+                        <!-- Total Quizzes -->
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <h3>Total Quizzes</h3>
+                            <p class="stat-value" id="total-quizzes">0</p>
+                            <small class="stat-label">Quizzes taken</small>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Statistics -->
+                    <div class="stats-section">
+                        <h3>Detailed Statistics</h3>
+                        <div class="detailed-stats">
+                            <div class="detailed-stat-row">
+                                <span class="stat-label-text">Total Sessions</span>
+                                <span class="stat-value-text" id="total-sessions">0</span>
+                            </div>
+                            <div class="detailed-stat-row">
+                                <span class="stat-label-text">Avg. Session</span>
+                                <span class="stat-value-text" id="avg-session-duration">0 min</span>
+                            </div>
+                            <div class="detailed-stat-row">
+                                <span class="stat-label-text">Learned Today</span>
+                                <span class="stat-value-text" id="words-today">0</span>
+                            </div>
+                            <div class="detailed-stat-row">
+                                <span class="stat-label-text">Last Study</span>
+                                <span class="stat-value-text" id="last-study-date">Never</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Performance Breakdown -->
+                    <div class="stats-section">
+                        <h3>Top Challenging Words</h3>
+                        <div id="quiz-breakdown" class="quiz-breakdown">
+                            <p class="empty-state">No quiz data yet. Take a quiz to see your performance!</p>
                         </div>
                     </div>
 
@@ -474,14 +528,6 @@
                     <div class="settings-section">
                         <h3>Speech</h3>
                         <div class="setting-item">
-                            <label for="speech-rate">
-                                <span>Speech Rate</span>
-                                <p class="setting-description">Adjust pronunciation speed</p>
-                            </label>
-                            <input type="range" id="speech-rate" min="0.5" max="1.5" step="0.1" value="0.9">
-                            <span id="speech-rate-value">0.9x</span>
-                        </div>
-                        <div class="setting-item">
                             <label for="auto-play">
                                 <span>Auto-play Pronunciation</span>
                                 <p class="setting-description">Automatically pronounce words when flipping cards</p>
@@ -519,7 +565,7 @@
                     </div>
 
                     <div class="app-info">
-                        <p>Vocab Master <span id="app-version">v1.1.2</span></p>
+                        <p>Vocab Master <span id="app-version">v1.2.0</span></p>
                         <p>572 Academic Word List vocabulary</p>
                         <p id="build-info" style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.5rem;"></p>
                     </div>
@@ -571,17 +617,17 @@
 
     <!-- JavaScript Modules -->
     <!-- Cache-busted scripts for development -->
-    <script src="js/config.js?v=20251216230703"></script>
-    <script src="js/deviceFingerprint.js?v=20251216230703"></script>
-    <script src="js/utils.js?v=20251216230703"></script>
-    <script src="js/api.js?v=20251216230703"></script>
-    <script src="js/migrationHelper.js?v=20251216230703"></script>
-    <script src="js/storage.js?v=20251216230703"></script>
-    <script src="js/speech.js?v=20251216230703"></script>
-    <script src="js/data.js?v=20251216230703"></script>
-    <script src="js/flashcard.js?v=20251216230703"></script>
-    <script src="js/quiz.js?v=20251216230703"></script>
-    <script src="js/stats.js?v=20251216230703"></script>
-    <script src="js/app.js?v=20251216230703"></script>
+    <script src="js/config.js?v=20251225"></script>
+    <script src="js/deviceFingerprint.js?v=20251225"></script>
+    <script src="js/utils.js?v=20251225"></script>
+    <script src="js/api.js?v=20251225"></script>
+    <script src="js/migrationHelper.js?v=20251225"></script>
+    <script src="js/storage.js?v=20251225"></script>
+    <script src="js/speech.js?v=20251225"></script>
+    <script src="js/data.js?v=20251225"></script>
+    <script src="js/flashcard.js?v=20251225"></script>
+    <script src="js/quiz.js?v=20251225"></script>
+    <script src="js/stats.js?v=20251225"></script>
+    <script src="js/app.js?v=20251225"></script>
 </body>
 </html>
