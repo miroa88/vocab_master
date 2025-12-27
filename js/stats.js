@@ -184,7 +184,7 @@ const StatsMode = {
 
     for (const perf of topChallenging) {
       // Get word details
-      const word = await DataService.getWordById(parseInt(perf.wordId));
+      const word = DataService.getById(parseInt(perf.wordId));
       if (!word) continue;
 
       const item = document.createElement('div');
