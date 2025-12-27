@@ -586,14 +586,20 @@ const FlashcardMode = {
         card.className = 'example-card';
         card.style.animation = `fadeIn 0.3s ease-in-out ${index * 100}ms`;
 
+        const elementId = `generated-example-${index}`;
         const p = document.createElement('p');
         p.innerHTML = `
-          ${this.escapeHtml(example)}
+          <span class="translatable-text" data-element-id="${elementId}">${this.escapeHtml(example)}</span>
           <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(example)}"
                   title="Speak example">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+          <button class="translate-btn inline-translate-btn" data-element-id="${elementId}" data-original-text="${this.escapeHtml(example)}" title="Translate example">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
             </svg>
           </button>
         `;
@@ -602,8 +608,9 @@ const FlashcardMode = {
         examplesContainer.appendChild(card);
       });
 
-      // Re-attach speak listeners
+      // Re-attach speak and translate listeners
       this.setupInlineSpeakButtons();
+      this.setupInlineTranslateButtons();
 
       Utils.showToast('Examples generated successfully!', 'success');
     } catch (error) {
