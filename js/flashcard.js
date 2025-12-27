@@ -307,7 +307,7 @@ const FlashcardMode = {
 
     // Set definition (for back side) with speak and translate buttons
     definitionText.innerHTML = `
-      <span class="translatable-text" data-element-id="definition">${word.definition}</span>
+      <span class="translatable-text" data-element-id="definition">${this.escapeHtml(word.definition)}</span>
     `;
 
     if (definitionActions) {
@@ -393,7 +393,7 @@ const FlashcardMode = {
 
       const p = document.createElement('p');
       p.innerHTML = `
-        <span class="translatable-text" data-element-id="${elementId}">${example}</span>
+        <span class="translatable-text" data-element-id="${elementId}">${this.escapeHtml(example)}</span>
         <button class="speak-btn inline-speak-btn" data-text="${this.escapeHtml(example)}" title="Speak example">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -777,6 +777,13 @@ const FlashcardMode = {
       }
       this.translationStates.set(elementId, 'translated');
       btn.classList.add('active');
+      return;
+    }
+
+    // Check for certification key before making API call
+    const certificate = await StorageService.getPreference('certificationKey');
+    if (!certificate) {
+      Utils.showToast('Add your certificate in Settings to enable AI translation', 'error');
       return;
     }
 

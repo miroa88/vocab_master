@@ -107,12 +107,19 @@ const SpeechService = {
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+    // Get JWT token for authentication
+    const token = ApiClient.getToken();
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Cert-Key": certificate,
-      },
+      headers: headers,
       body: JSON.stringify({ text }),
     });
 
