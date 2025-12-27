@@ -300,13 +300,22 @@ const App = {
     const navButtons = document.querySelectorAll('.nav-btn');
 
     navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const viewId = btn.dataset.view;
-        this.switchView(viewId);
+      btn.addEventListener('click', (e) => {
+        try {
+          e.preventDefault();
+          e.stopPropagation();
 
-        // Update active button
-        navButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+          const viewId = btn.dataset.view;
+          console.log('Switching to view:', viewId);
+          this.switchView(viewId);
+
+          // Update active button
+          navButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        } catch (error) {
+          console.error('Navigation error:', error);
+          Utils.showToast('Navigation failed. Please refresh the page.', 'error');
+        }
       });
     });
   },
@@ -322,11 +331,16 @@ const App = {
       targetView.classList.add('active');
       this.currentView = viewId;
 
-      // Refresh view-specific content
-      if (viewId === 'stats-view') {
-        StatsMode.refresh();
-      } else if (viewId === 'quiz-view') {
-        QuizMode.reset();
+      // Refresh view-specific content with error handling
+      try {
+        if (viewId === 'stats-view') {
+          StatsMode.refresh();
+        } else if (viewId === 'quiz-view') {
+          QuizMode.reset();
+        }
+      } catch (error) {
+        console.error('Error refreshing view:', error);
+        // Don't block navigation even if refresh fails
       }
     }
   },
