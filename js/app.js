@@ -71,6 +71,9 @@ const App = {
           Utils.showToast('Private browsing detected. Settings may not persist after closing the browser.', 'info', 5000);
         }, 2000);
       }
+
+      // Show iOS install banner if applicable
+      this.showIOSInstallBanner();
     } catch (error) {
       console.error('Error during bootstrap:', error);
       this.hideLoading();
@@ -735,6 +738,32 @@ const App = {
     } else if (settingsName) {
       settingsName.textContent = 'Not signed in';
     }
+  },
+
+  // --- iOS Install Banner ---
+  showIOSInstallBanner() {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true;
+
+    if (!isIOS || isStandalone) return;
+
+    // Only show again after 30 days from last dismiss
+    const dismissed = localStorage.getItem('iosInstallBannerDismissed');
+    if (dismissed) {
+      const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) return;
+    }
+
+    const banner = document.getElementById('ios-install-banner');
+    const closeBtn = document.getElementById('ios-banner-close');
+    if (!banner) return;
+
+    setTimeout(() => banner.classList.remove('hidden'), 2500);
+
+    closeBtn?.addEventListener('click', () => {
+      banner.classList.add('hidden');
+      localStorage.setItem('iosInstallBannerDismissed', Date.now().toString());
+    });
   },
 
   // --- Loading helpers ---

@@ -94,7 +94,13 @@ const SpeechService = {
       return true;
     } catch (error) {
       console.error("Backend TTS failed, falling back to browser speech", error);
-      Utils.showToast("Cloud TTS failed, using browser voice", "error");
+      if (error.status === 403) {
+        await StorageService.clearCertificationKey();
+        StorageService.revokeCertificationKey().catch(() => {});
+        Utils.showToast("Certification key expired. Please renew it in Settings.", "error");
+      } else {
+        Utils.showToast("Cloud TTS failed, using browser voice", "error");
+      }
       return this.speakWithBrowser(text, options);
     }
   },
@@ -117,16 +123,35 @@ const SpeechService = {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({ text }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    let response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({ text }),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        const err = new Error('TTS request timed out');
+        err.status = 0;
+        throw err;
+      }
+      throw fetchError;
+    }
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       const errorMessage = errorData.message || response.statusText;
-      throw new Error(errorMessage);
+      const err = new Error(errorMessage);
+      err.status = response.status;
+      err.details = errorData;
+      throw err;
     }
 
     const arrayBuffer = await response.arrayBuffer();

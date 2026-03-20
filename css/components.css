@@ -560,7 +560,7 @@
   padding: var(--space-sm) var(--space-md);
   border: 2px solid var(--border);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
+  font-size: 16px; /* Must be ≥16px to prevent iOS Safari auto-zoom on focus */
   font-family: monospace;
   color: var(--text-primary);
   background-color: var(--background);
@@ -878,6 +878,92 @@
   flex-wrap: wrap;
   min-width: 220px;
 }
+
+/* ===== iOS Install Banner ===== */
+.ios-install-banner {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px);
+  left: 12px;
+  right: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--primary-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-fixed);
+  padding: 14px 16px;
+  animation: slideUp 0.4s ease;
+}
+
+.ios-install-banner.hidden {
+  display: none;
+}
+
+.ios-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ios-banner-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.ios-banner-text {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.ios-banner-text strong {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.ios-banner-text p {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-tight);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.ios-share-svg {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  stroke: var(--primary);
+}
+
+.ios-banner-text em {
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary);
+}
+
+.ios-banner-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+}
+
+/* ===== End iOS Install Banner ===== */
 
 .account-actions .btn-secondary,
 .account-actions .btn-danger {

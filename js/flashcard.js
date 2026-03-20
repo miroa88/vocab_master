@@ -6,7 +6,7 @@ const FlashcardMode = {
   isFlipped: false,
   filters: {
     search: '',
-    status: 'all',
+    status: 'unlearned',
     difficulty: 'all'
   },
   enableSwipe: true,
@@ -628,25 +628,7 @@ const FlashcardMode = {
   // Toggle filter panel
   toggleFilterPanel() {
     const filterPanel = document.getElementById('filter-panel');
-    const isHidden = filterPanel.classList.contains('hidden');
-
     filterPanel.classList.toggle('hidden');
-
-    // When opening the filter panel, set Unlearned as default if currently on "All"
-    if (isHidden && this.filters.status === 'all') {
-      const statusFilters = filterPanel.querySelectorAll('[data-filter]');
-      statusFilters.forEach(btn => btn.classList.remove('active'));
-
-      const unlearnedBtn = filterPanel.querySelector('[data-filter="unlearned"]');
-      if (unlearnedBtn) {
-        unlearnedBtn.classList.add('active');
-        this.filters.status = 'unlearned';
-        this.loadWords().then(() => {
-          this.renderCard();
-          this.updateCardCounter();
-        });
-      }
-    }
   },
 
   // Update card counter
@@ -824,8 +806,14 @@ const FlashcardMode = {
 
     } catch (error) {
       console.error('Translation failed:', error);
-      const errorMessage = error.details?.message || error.message || 'Failed to translate';
-      Utils.showToast(errorMessage, 'error');
+      if (error.status === 403) {
+        await StorageService.clearCertificationKey();
+        StorageService.revokeCertificationKey().catch(() => {});
+        Utils.showToast('Certification key expired. Please renew it in Settings.', 'error');
+      } else {
+        const errorMessage = error.details?.message || error.message || 'Failed to translate';
+        Utils.showToast(errorMessage, 'error');
+      }
     } finally {
       btn.classList.remove('loading');
       btn.disabled = false;

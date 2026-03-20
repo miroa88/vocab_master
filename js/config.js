@@ -1,6 +1,6 @@
 const AppConfig = {
-  VERSION: '1.3.0',
-  BUILD_DATE: '2024-12-27',
+  VERSION: '1.4.0',
+  BUILD_DATE: '2026-03-19',
   BUILD_TIME: new Date().toISOString(),
 
   API_BASE_URL: 'https://instyle-node-server.onrender.com',

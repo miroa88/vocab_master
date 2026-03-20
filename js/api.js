@@ -11,7 +11,7 @@ const ApiClient = {
    */
   init() {
     this.baseURL =
-      window.AppConfig.API_BASE_URL || window.AppConfig.API_BASE_URL;
+      (window.AppConfig && window.AppConfig.API_BASE_URL) || "https://instyle-node-server.onrender.com";
     console.log("API Client initialized with base URL:", this.baseURL);
   },
 

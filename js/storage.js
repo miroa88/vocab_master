@@ -284,6 +284,27 @@ const StorageService = {
           console.log('[StorageService.get] ✗ No certification key in MongoDB response');
         }
 
+        // Merge any locally saved learned IDs that weren't synced to server
+        // (can happen when server was down during a previous session)
+        if (!this.isPrivateMode) {
+          try {
+            const localRaw = localStorage.getItem(this.getUserStorageKey());
+            if (localRaw) {
+              const localParsed = JSON.parse(localRaw);
+              if (localParsed.learned && localParsed.learned.length > 0) {
+                const serverLearnedSet = new Set(progress.learned || []);
+                const unsynced = localParsed.learned.filter(id => !serverLearnedSet.has(id));
+                if (unsynced.length > 0) {
+                  console.log(`[StorageService.get] Merging ${unsynced.length} locally-saved learned word(s) with server data`);
+                  progress.learned = [...(progress.learned || []), ...unsynced];
+                }
+              }
+            }
+          } catch (e) {
+            // Ignore localStorage read errors during merge
+          }
+        }
+
         // Deep merge to preserve nested preferences
         this.progressCache = this._deepMerge(this.getDefault(), progress);
 
@@ -388,22 +409,6 @@ const StorageService = {
   async markLearned(wordId) {
     const data = await this.get();
     if (!data.learned.includes(wordId)) {
-      if (this.useMongoDB) {
-        try {
-          await ApiClient.markLearned(this.currentUserId, wordId, true);
-          // Update cache
-          data.learned.push(wordId);
-          data.stats.totalWordsLearned = data.learned.length;
-          this.progressCache = data;
-          this._saveLocal(data);
-          return true;
-        } catch (error) {
-          console.warn('MongoDB API failed:', error);
-          this.disableMongoFallback('Mark learned failed', error);
-        }
-      }
-
-      // Fallback or non-MongoDB mode
       data.learned.push(wordId);
       data.stats.totalWordsLearned = data.learned.length;
       await this.save(data);
@@ -417,22 +422,6 @@ const StorageService = {
     const data = await this.get();
     const index = data.learned.indexOf(wordId);
     if (index > -1) {
-      if (this.useMongoDB) {
-        try {
-          await ApiClient.markLearned(this.currentUserId, wordId, false);
-          // Update cache
-          data.learned.splice(index, 1);
-          data.stats.totalWordsLearned = data.learned.length;
-          this.progressCache = data;
-          this._saveLocal(data);
-          return true;
-        } catch (error) {
-          console.warn('MongoDB API failed:', error);
-          this.disableMongoFallback('Unmark learned failed', error);
-        }
-      }
-
-      // Fallback or non-MongoDB mode
       data.learned.splice(index, 1);
       data.stats.totalWordsLearned = data.learned.length;
       await this.save(data);
@@ -782,6 +771,15 @@ const StorageService = {
     } catch (error) {
       throw new Error(`Failed to revoke certification key: ${error.message}`);
     }
+  },
+
+  // Clear certification key from local cache only (no backend call)
+  async clearCertificationKey() {
+    const data = await this.get();
+    data.preferences.certificationKey = null;
+    data.preferences.certificationActivatedAt = null;
+    this.progressCache = data;
+    this._saveLocal(data);
   },
 
   // Get words learned this week

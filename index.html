@@ -12,6 +12,8 @@
     <meta http-equiv="Expires" content="0">
     <title>Vocab Master - Learn English Vocabulary</title>
     <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/variables.css">
@@ -122,8 +124,8 @@
                     <div class="filter-group">
                         <label>Status:</label>
                         <div class="filter-options">
-                            <button class="filter-option active" data-filter="all">All</button>
-                            <button class="filter-option" data-filter="unlearned">Unlearned</button>
+                            <button class="filter-option" data-filter="all">All</button>
+                            <button class="filter-option active" data-filter="unlearned">Unlearned</button>
                             <button class="filter-option" data-filter="learned">Learned</button>
                         </div>
                     </div>
@@ -568,7 +570,7 @@
                     </div>
 
                     <div class="app-info">
-                        <p>Vocab Master <span id="app-version">v1.2.0</span></p>
+                        <p>Vocab Master <span id="app-version">v1.4.0</span></p>
                         <p>572 Academic Word List vocabulary</p>
                         <p id="build-info" style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.5rem;"></p>
                     </div>
@@ -618,19 +620,31 @@
         <div class="spinner"></div>
     </div>
 
+    <!-- iOS Add to Home Screen Banner -->
+    <div id="ios-install-banner" class="ios-install-banner hidden" role="dialog" aria-label="Install app">
+        <button id="ios-banner-close" class="ios-banner-close" aria-label="Dismiss">✕</button>
+        <div class="ios-banner-content">
+            <img src="assets/icons/apple-touch-icon.png" alt="" class="ios-banner-icon">
+            <div class="ios-banner-text">
+                <strong>Install Vocab Master</strong>
+                <p>Tap the <svg class="ios-share-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share button, then <em>"Add to Home Screen"</em></p>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Modules -->
     <!-- Cache-busted scripts for production -->
-    <script src="js/config.js?v=20251227"></script>
-    <script src="js/deviceFingerprint.js?v=20251227"></script>
-    <script src="js/utils.js?v=20251227"></script>
-    <script src="js/api.js?v=20251227"></script>
-    <script src="js/migrationHelper.js?v=20251227"></script>
-    <script src="js/storage.js?v=20251227"></script>
-    <script src="js/speech.js?v=20251227"></script>
-    <script src="js/data.js?v=20251227"></script>
-    <script src="js/flashcard.js?v=20251227"></script>
-    <script src="js/quiz.js?v=20251227"></script>
-    <script src="js/stats.js?v=20251227"></script>
-    <script src="js/app.js?v=20251227"></script>
+    <script src="js/config.js?v=20260319"></script>
+    <script src="js/deviceFingerprint.js?v=20260319"></script>
+    <script src="js/utils.js?v=20260319"></script>
+    <script src="js/api.js?v=20260319"></script>
+    <script src="js/migrationHelper.js?v=20260319"></script>
+    <script src="js/storage.js?v=20260319"></script>
+    <script src="js/speech.js?v=20260319"></script>
+    <script src="js/data.js?v=20260319"></script>
+    <script src="js/flashcard.js?v=20260319"></script>
+    <script src="js/quiz.js?v=20260319"></script>
+    <script src="js/stats.js?v=20260319"></script>
+    <script src="js/app.js?v=20260319"></script>
 </body>
 </html>
