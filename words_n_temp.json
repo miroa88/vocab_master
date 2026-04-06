@@ -1,0 +1,205 @@
+[
+  {
+    "id": 359,
+    "word": "negate",
+    "definition": "To make something have no effect; to state that something does not exist or is not true.",
+    "partOfSpeech": "verb",
+    "synonyms": [
+      "cancel out",
+      "nullify",
+      "deny",
+      "invalidate"
+    ],
+    "examples": [
+      "These results do not negate the previous findings.",
+      "He simply negated any responsibility for the error."
+    ],
+    "difficulty": "advanced",
+    "category": "academic",
+    "translationFa": "نفی کردن؛ خنثی کردن",
+    "translationEn": "to make something not effective",
+    "translationHy": "ժխտել, չեղարկել"
+  },
+  {
+    "id": 360,
+    "word": "network",
+    "definition": "A system of connected people or things, such as computers, roads, or social contacts.",
+    "partOfSpeech": "noun/verb",
+    "synonyms": [
+      "system",
+      "web",
+      "grid",
+      "connect"
+    ],
+    "examples": [
+      "The university has a strong network of alumni.",
+      "Computers on the same network can share files easily."
+    ],
+    "difficulty": "intermediate",
+    "category": "technology",
+    "translationFa": "شبکه",
+    "translationEn": "system of connected parts",
+    "translationHy": "ցանց"
+  },
+  {
+    "id": 361,
+    "word": "neutral",
+    "definition": "Not supporting any side in an argument, fight, or war; having no strong or clear quality or effect.",
+    "partOfSpeech": "adjective",
+    "synonyms": [
+      "impartial",
+      "unbiased",
+      "independent"
+    ],
+    "examples": [
+      "The country remained neutral during the conflict.",
+      "Try to use neutral language in academic writing."
+    ],
+    "difficulty": "intermediate",
+    "category": "general",
+    "translationFa": "بی‌طرف؛ خنثی",
+    "translationEn": "not supporting either side",
+    "translationHy": "չեզոք"
+  },
+  {
+    "id": 362,
+    "word": "nevertheless",
+    "definition": "In spite of what has just been said; however.",
+    "partOfSpeech": "adverb",
+    "synonyms": [
+      "however",
+      "nonetheless",
+      "even so"
+    ],
+    "examples": [
+      "The task was difficult; nevertheless, we completed it on time.",
+      "The sample size is small; nevertheless, the results are useful."
+    ],
+    "difficulty": "advanced",
+    "category": "academic",
+    "translationFa": "با این حال؛ با وجود این",
+    "translationEn": "in spite of what was said",
+    "translationHy": "այնուամենայնիվ, սակայն"
+  },
+  {
+    "id": 363,
+    "word": "nonetheless",
+    "definition": "In spite of what has just been said or done; nevertheless.",
+    "partOfSpeech": "adverb",
+    "synonyms": [
+      "nevertheless",
+      "however",
+      "all the same"
+    ],
+    "examples": [
+      "The method is not perfect; nonetheless, it is widely used.",
+      "She was tired; nonetheless, she agreed to help."
+    ],
+    "difficulty": "advanced",
+    "category": "academic",
+    "translationFa": "با این وجود؛ با این حال",
+    "translationEn": "despite that",
+    "translationHy": "այնուամենայնիվ, այդուհանդերձ"
+  },
+  {
+    "id": 364,
+    "word": "norm",
+    "definition": "A situation or pattern of behavior that is usual or expected in a particular group or society.",
+    "partOfSpeech": "noun",
+    "synonyms": [
+      "standard",
+      "rule",
+      "custom"
+    ],
+    "examples": [
+      "In many countries, working long hours has become the norm.",
+      "Social norms influence how people behave in public."
+    ],
+    "difficulty": "intermediate",
+    "category": "academic",
+    "translationFa": "هنجار؛ قاعده معمول",
+    "translationEn": "accepted standard or rule",
+    "translationHy": "նորմ, ընդունված չափանիշ"
+  },
+  {
+    "id": 365,
+    "word": "normal",
+    "definition": "Usual, typical, or expected; not strange or unusual.",
+    "partOfSpeech": "adjective",
+    "synonyms": [
+      "usual",
+      "ordinary",
+      "standard",
+      "typical"
+    ],
+    "examples": [
+      "It is normal to feel nervous before an exam.",
+      "After the storm, life slowly returned to normal."
+    ],
+    "difficulty": "basic",
+    "category": "general",
+    "translationFa": "عادی؛ معمول",
+    "translationEn": "usual or expected",
+    "translationHy": "նորմալ, սովորական"
+  },
+  {
+    "id": 366,
+    "word": "notion",
+    "definition": "An idea, opinion, or belief about something.",
+    "partOfSpeech": "noun",
+    "synonyms": [
+      "idea",
+      "concept",
+      "belief"
+    ],
+    "examples": [
+      "He rejected the notion that money brings happiness.",
+      "Different cultures have different notions of success."
+    ],
+    "difficulty": "intermediate",
+    "category": "academic",
+    "translationFa": "تصور؛ عقیده",
+    "translationEn": "idea or belief",
+    "translationHy": "գաղափար, պատկերացում"
+  },
+  {
+    "id": 367,
+    "word": "notwithstanding",
+    "definition": "Despite something; in spite of something.",
+    "partOfSpeech": "preposition/adverb",
+    "synonyms": [
+      "despite",
+      "in spite of",
+      "regardless of"
+    ],
+    "examples": [
+      "Notwithstanding the difficulties, the team completed the project.",
+      "There were some complaints, the overall response notwithstanding."
+    ],
+    "difficulty": "advanced",
+    "category": "academic",
+    "translationFa": "با وجودِ",
+    "translationEn": "in spite of",
+    "translationHy": "չնայած, անկախ"
+  },
+  {
+    "id": 368,
+    "word": "nuclear",
+    "definition": "Relating to the energy produced by splitting atoms; relating to weapons that use this energy; relating to the central part of something.",
+    "partOfSpeech": "adjective",
+    "synonyms": [
+      "atomic",
+      "nuclear-powered",
+      "central"
+    ],
+    "examples": [
+      "The country is reducing its reliance on nuclear power.",
+      "Nuclear weapons are a major global concern."
+    ],
+    "difficulty": "advanced",
+    "category": "science",
+    "translationFa": "هسته‌ای؛ اتمی",
+    "translationEn": "relating to the nucleus or atomic energy",
+    "translationHy": "միջուկային"
+  }
+]
