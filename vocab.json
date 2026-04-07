@@ -333,8 +333,8 @@
                         "govern"
                   ],
                   "examples": [
-                        "She administrates the company's human resources department.",
-                        "The committee will administrate the scholarship program."
+                        "She administers the company's human resources department.",
+                        "The committee will administer the scholarship program."
                   ],
                   "difficulty": "advanced",
                   "translationFa": "اداره کردن؛ مدیریت کردن",
@@ -359,7 +359,7 @@
                   ],
                   "difficulty": "basic",
                   "translationFa": "بزرگسال؛ بالغ",
-                  "translationEn": "fully grown person; adult",
+                  "translationEn": "a fully grown or mature person",
                   "category": "general",
                   "translationHy": "մեծահասակ"
             },
@@ -722,17 +722,17 @@
             {
                   "id": 35,
                   "word": "approach",
-                  "definition": "Come near or nearer to (someone or something) in distance or time.",
+                  "definition": "To come near or nearer to something; a way of dealing with or thinking about a problem.",
                   "partOfSpeech": "verb/noun",
                   "synonyms": [
                         "advance",
                         "near",
-                        "draw near",
-                        "come toward"
+                        "method",
+                        "strategy"
                   ],
                   "examples": [
-                        "The cat is approaching its prey.",
-                        "Winter is approaching."
+                        "Winter is approaching faster than expected.",
+                        "The teacher used a creative approach to explain the concept."
                   ],
                   "difficulty": "basic",
                   "translationFa": "نزدیک شدن؛ رویکرد",
@@ -925,7 +925,7 @@
                   ],
                   "difficulty": "basic",
                   "translationFa": "کمک کردن؛ یاری کردن",
-                  "translationEn": "to help or assist",
+                  "translationEn": "to help or support",
                   "category": "general",
                   "translationHy": "օգնել, աջակցել"
             },
@@ -1247,13 +1247,13 @@
             {
                   "id": 60,
                   "word": "brief",
-                  "definition": "Of short duration; not lasting for long.",
+                  "definition": "Short in duration or length; to give someone a summary of information; a set of instructions.",
                   "partOfSpeech": "adjective/verb/noun",
                   "synonyms": [
                         "short",
                         "concise",
-                        "succinct",
-                        "terse"
+                        "inform",
+                        "summary"
                   ],
                   "examples": [
                         "It was only a brief visit.",
@@ -2031,7 +2031,7 @@
                         "encompass"
                   ],
                   "examples": [
-                        "The committee is comprised of representatives from both the public and private sectors.",
+                        "The committee comprises representatives from both the public and private sectors.",
                         "The first-aid kit comprises a wide variety of items."
                   ],
                   "difficulty": "intermediate",
@@ -9108,16 +9108,17 @@
             {
                   "id": 437,
                   "word": "radical",
-                  "definition": "Relating to great or extreme change; believing that important political or social changes are necessary.",
+                  "definition": "Relating to great or extreme change; a person who holds extreme political views.",
                   "partOfSpeech": "adjective/noun",
                   "synonyms": [
                         "extreme",
                         "revolutionary",
-                        "far-reaching"
+                        "far-reaching",
+                        "extremist"
                   ],
                   "examples": [
                         "The new policy represents a radical shift in education.",
-                        "Some radical groups demanded immediate reform."
+                        "The self-described radicals demanded an immediate overhaul of the system."
                   ],
                   "difficulty": "advanced",
                   "category": "politics",
@@ -9137,7 +9138,7 @@
                   ],
                   "examples": [
                         "Participants were selected at random from the class list.",
-                        "The survey results showed no random errors in the data."
+                        "Participants were selected using a random sampling method."
                   ],
                   "difficulty": "intermediate",
                   "category": "academic",
@@ -10097,7 +10098,7 @@
                   "definition": "The biological distinction between male and female; also, physical activity between people.",
                   "partOfSpeech": "noun",
                   "synonyms": [
-                        "gender",
+                        "biological sex",
                         "intercourse"
                   ],
                   "examples": [
@@ -10723,7 +10724,7 @@
                   "definition": "Something added to something else to make it more complete; to add extra to improve or complete something.",
                   "partOfSpeech": "noun/verb",
                   "synonyms": [
-                        "add",
+                        "complement",
                         "enhance",
                         "reinforce",
                         "addition"
@@ -11176,7 +11177,7 @@
                   "category": "general",
                   "translationFa": "موضوع",
                   "translationEn": "subject that is discussed or studied",
-                  "translationHy": "թեմա"
+                  "translationHy": "թեմա, հարց"
             },
             {
                   "id": 538,
@@ -11418,7 +11419,7 @@
                         "form the basis of",
                         "support",
                         "be at the root of",
-                        "ground"
+                        "underpin"
                   ],
                   "examples": [
                         "Economic factors underlie many social problems in the region.",
