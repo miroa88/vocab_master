@@ -9724,7 +9724,7 @@
                   "category": "general",
                   "translationFa": "آشکار کردن",
                   "translationEn": "to make something known or visible",
-                  "translationHy": "բացահայտել, մերկացնել"
+                  "translationHy": "բացահայտել, ի հայտ բերել"
             },
             {
                   "id": 468,
@@ -9804,7 +9804,7 @@
                   "category": "academic",
                   "translationFa": "انقلاب",
                   "translationEn": "sudden major change, especially in government",
-                  "translationHy": "հեղափոխություն"
+                  "translationHy": "հեղափոխություն, պտույտ"
             },
             {
                   "id": 472,
@@ -10098,7 +10098,6 @@
                   "partOfSpeech": "noun",
                   "synonyms": [
                         "gender",
-                        "sexuality",
                         "intercourse"
                   ],
                   "examples": [
@@ -10386,7 +10385,7 @@
             {
                   "id": 500,
                   "word": "statistic",
-                  "definition": "A number that represents a fact or measurement; the study of collecting and analyzing numerical data.",
+                  "definition": "A number that represents a fact or measurement collected from a group or dataset.",
                   "partOfSpeech": "noun",
                   "synonyms": [
                         "figure",
@@ -10506,7 +10505,7 @@
                   "category": "academic",
                   "translationFa": "ساختار",
                   "translationEn": "way the parts of something are organized",
-                  "translationHy": "կառուցվածք, կառուցվածքային"
+                  "translationHy": "կառուցվածք, կառույց"
             },
             {
                   "id": 506,
@@ -10580,7 +10579,7 @@
                         "later",
                         "following",
                         "succeeding",
-                        "afterward"
+                        "ensuing"
                   ],
                   "examples": [
                         "In subsequent chapters, the author explores possible solutions.",
@@ -10643,7 +10642,7 @@
                         "replacement",
                         "heir",
                         "next in line",
-                        "follow-up"
+                        "inheritor"
                   ],
                   "examples": [
                         "The company has not yet chosen a successor to the CEO.",
@@ -10664,7 +10663,7 @@
                         "enough",
                         "adequate",
                         "ample",
-                        "plenty"
+                        "plentiful"
                   ],
                   "examples": [
                         "We have sufficient evidence to support our claim.",
@@ -10695,7 +10694,7 @@
                   "category": "general",
                   "translationFa": "جمع؛ مبلغ",
                   "translationEn": "total amount; result of adding numbers",
-                  "translationHy": "գումար, գումարել"
+                  "translationHy": "գումար, ընդհանուր"
             },
             {
                   "id": 515,
@@ -10873,7 +10872,7 @@
                         "aim",
                         "goal",
                         "objective",
-                        "focus on"
+                        "mark"
                   ],
                   "examples": [
                         "The company failed to meet its sales target this year.",
@@ -10915,7 +10914,7 @@
                         "group",
                         "crew",
                         "squad",
-                        "staff"
+                        "unit"
                   ],
                   "examples": [
                         "Our research team includes experts from several countries.",
@@ -11020,7 +11019,7 @@
                         "anxious",
                         "nervous",
                         "strained",
-                        "stressful"
+                        "stressed"
                   ],
                   "examples": [
                         "The atmosphere in the meeting room was very tense.",
@@ -11104,7 +11103,7 @@
                         "hypothesis",
                         "explanation",
                         "model",
-                        "concept"
+                        "framework"
                   ],
                   "examples": [
                         "Darwin’s theory of evolution transformed biological science.",
@@ -11187,8 +11186,8 @@
                   "synonyms": [
                         "track",
                         "follow",
-                        "outline",
-                        "mark"
+                        "sign",
+                        "vestige"
                   ],
                   "examples": [
                         "Researchers traced the spread of the disease across the region.",
@@ -11455,8 +11454,8 @@
             {
                   "id": 551,
                   "word": "uniform",
-                  "definition": "Always the same in form, appearance, or way of behaving across different parts or times.",
-                  "partOfSpeech": "adjective",
+                  "definition": "Always the same in form, appearance, or way of behaving across different parts or times; a special set of clothing worn by members of a group or organization.",
+                  "partOfSpeech": "adjective/noun",
                   "synonyms": [
                         "consistent",
                         "unchanging",
@@ -11465,7 +11464,7 @@
                   ],
                   "examples": [
                         "The company introduced a uniform policy for all its branches.",
-                        "Students must wear a uniform outfit during school hours."
+                        "Students must wear a uniform to school."
                   ],
                   "difficulty": "intermediate",
                   "category": "general",
@@ -11503,7 +11502,7 @@
                         "one-of-a-kind",
                         "distinctive",
                         "special",
-                        "unusual"
+                        "singular"
                   ],
                   "examples": [
                         "Each student has a unique learning style.",
@@ -11524,7 +11523,7 @@
                         "use",
                         "employ",
                         "make use of",
-                        "exploit"
+                        "apply"
                   ],
                   "examples": [
                         "The team utilized available data to improve their marketing strategy.",
@@ -11671,7 +11670,7 @@
                         "digital",
                         "online",
                         "computer-based",
-                        "almost"
+                        "near"
                   ],
                   "examples": [
                         "Many universities now offer virtual classrooms for distance learners.",
@@ -11734,7 +11733,7 @@
                         "optical",
                         "pictorial",
                         "graphic",
-                        "seen"
+                        "ocular"
                   ],
                   "examples": [
                         "The teacher used visual aids to explain the complex concept.",
