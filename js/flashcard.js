@@ -4,6 +4,8 @@ const FlashcardMode = {
   currentIndex: 0,
   currentWords: [],
   isFlipped: false,
+  isNavigating: false,
+  autoPlayTimer: null,
   filters: {
     search: '',
     status: 'unlearned',
@@ -232,6 +234,10 @@ const FlashcardMode = {
     // Clear translation states when changing cards
     this.translationStates.clear();
 
+    // Stop any active speech animation
+    const speakBtn = document.getElementById('speak-btn');
+    if (speakBtn) speakBtn.classList.remove('speaking');
+
     if (this.currentWords.length === 0) {
       this.showEmptyState();
       return;
@@ -454,31 +460,54 @@ const FlashcardMode = {
     // Auto-play pronunciation if enabled and flipping to back
     const autoPlay = await StorageService.getPreference('autoPlay');
     if (this.isFlipped && autoPlay) {
-      setTimeout(() => this.speakWord(), 300);
+      this._cancelAutoPlay();
+      this.autoPlayTimer = setTimeout(() => {
+        this.autoPlayTimer = null;
+        this.speakWord();
+      }, 300);
     }
   },
 
   // Previous card
   async previousCard() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-      await this.renderCard();
-      // Ensure scroll is reset after DOM update
-      this.resetScrollPosition();
-    } else {
-      Utils.showToast('This is the first card', 'info');
+    if (this.isNavigating) return;
+    this.isNavigating = true;
+    this._cancelAutoPlay();
+    try {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+        await this.renderCard();
+        this.resetScrollPosition();
+      } else {
+        Utils.showToast('This is the first card', 'info');
+      }
+    } finally {
+      this.isNavigating = false;
     }
   },
 
   // Next card
   async nextCard() {
-    if (this.currentIndex < this.currentWords.length - 1) {
-      this.currentIndex++;
-      await this.renderCard();
-      // Ensure scroll is reset after DOM update
-      this.resetScrollPosition();
-    } else {
-      Utils.showToast('This is the last card', 'info');
+    if (this.isNavigating) return;
+    this.isNavigating = true;
+    this._cancelAutoPlay();
+    try {
+      if (this.currentIndex < this.currentWords.length - 1) {
+        this.currentIndex++;
+        await this.renderCard();
+        this.resetScrollPosition();
+      } else {
+        Utils.showToast('This is the last card', 'info');
+      }
+    } finally {
+      this.isNavigating = false;
+    }
+  },
+
+  _cancelAutoPlay() {
+    if (this.autoPlayTimer !== null) {
+      clearTimeout(this.autoPlayTimer);
+      this.autoPlayTimer = null;
     }
   },
 
@@ -534,6 +563,7 @@ const FlashcardMode = {
     if (!word) return;
 
     const speakBtn = document.getElementById('speak-btn');
+    if (!speakBtn) return;
     speakBtn.classList.add('speaking');
 
     SpeechService.speak(word.word, {

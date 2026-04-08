@@ -352,17 +352,23 @@
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast);
   min-height: 40px;
   flex: 1;
 }
 
-.control-btn:hover:not(:disabled) {
-  background-color: var(--primary);
-  color: var(--text-inverse);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .control-btn:hover:not(:disabled) {
+    background-color: var(--primary);
+    color: var(--text-inverse);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .control-btn:active:not(:disabled) {
@@ -387,16 +393,21 @@
   font-weight: var(--font-weight-semibold);
   color: var(--success);
   cursor: pointer;
-  transition: all var(--transition-fast);
-  max-height: 40px;
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast);
+  min-height: 40px;
   flex: 1;
 }
 
-.mark-learned-btn:hover {
-  background-color: var(--success);
-  color: var(--text-inverse);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .mark-learned-btn:hover {
+    background-color: var(--success);
+    color: var(--text-inverse);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .mark-learned-btn.learned {
