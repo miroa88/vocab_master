@@ -408,8 +408,9 @@ const StorageService = {
   // Mark word as learned
   async markLearned(wordId) {
     const data = await this.get();
-    if (!data.learned.includes(wordId)) {
-      data.learned.push(wordId);
+    const numId = Number(wordId);
+    if (!data.learned.some(id => Number(id) === numId)) {
+      data.learned.push(numId);
       data.stats.totalWordsLearned = data.learned.length;
       await this.save(data);
       return true;
@@ -420,7 +421,8 @@ const StorageService = {
   // Unmark word as learned
   async unmarkLearned(wordId) {
     const data = await this.get();
-    const index = data.learned.indexOf(wordId);
+    const numId = Number(wordId);
+    const index = data.learned.findIndex(id => Number(id) === numId);
     if (index > -1) {
       data.learned.splice(index, 1);
       data.stats.totalWordsLearned = data.learned.length;
@@ -433,13 +435,14 @@ const StorageService = {
   // Check if word is learned
   async isLearned(wordId) {
     const data = await this.get();
-    return data.learned.includes(wordId);
+    const numId = Number(wordId);
+    return data.learned.some(id => Number(id) === numId);
   },
 
-  // Get learned word IDs
+  // Get learned word IDs (always returns numbers to match vocab.json id types)
   async getLearnedIds() {
     const data = await this.get();
-    return data.learned;
+    return data.learned.map(id => Number(id));
   },
 
   // Get learned count
