@@ -471,16 +471,18 @@ const FlashcardMode = {
   // Previous card
   async previousCard() {
     if (this.isNavigating) return;
+    if (this.currentWords.length <= 1) return;
     this.isNavigating = true;
     this._cancelAutoPlay();
     try {
       if (this.currentIndex > 0) {
         this.currentIndex--;
-        await this.renderCard();
-        this.resetScrollPosition();
       } else {
-        Utils.showToast('This is the first card', 'info');
+        this.currentIndex = this.currentWords.length - 1;
+        Utils.showToast('Wrapped to last card', 'info');
       }
+      await this.renderCard();
+      this.resetScrollPosition();
     } finally {
       this.isNavigating = false;
     }
@@ -489,16 +491,18 @@ const FlashcardMode = {
   // Next card
   async nextCard() {
     if (this.isNavigating) return;
+    if (this.currentWords.length <= 1) return;
     this.isNavigating = true;
     this._cancelAutoPlay();
     try {
       if (this.currentIndex < this.currentWords.length - 1) {
         this.currentIndex++;
-        await this.renderCard();
-        this.resetScrollPosition();
       } else {
-        Utils.showToast('This is the last card', 'info');
+        this.currentIndex = 0;
+        Utils.showToast('Back to first card', 'info');
       }
+      await this.renderCard();
+      this.resetScrollPosition();
     } finally {
       this.isNavigating = false;
     }
@@ -674,6 +678,13 @@ const FlashcardMode = {
       const percentage = (current / total) * 100;
       cardProgressFill.style.width = `${percentage}%`;
     }
+
+    // Disable nav buttons when only 1 card (nothing to navigate to)
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const disabled = total <= 1;
+    if (prevBtn) prevBtn.disabled = disabled;
+    if (nextBtn) nextBtn.disabled = disabled;
   },
 
   // Update progress indicator in header
